@@ -10,6 +10,7 @@ export interface DayPlan {
   dateISO: string;
   tempMax: number;
   hourRange: string;
+  startHour: number;
   cost: CostEstimate;
 }
 
@@ -56,6 +57,7 @@ export function useWeatherCost() {
       dateISO: forecast.today.date,
       tempMax: forecast.today.tempMax,
       hourRange: formatHourRange(win.startHour, win.endHour),
+      startHour: win.startHour,
       cost: estimateCost(volume, pump),
     };
     const winT = sunniestWindow(forecast.hourlyRadiationTomorrow, 0, hours);
@@ -63,6 +65,7 @@ export function useWeatherCost() {
       dateISO: forecast.tomorrow.date,
       tempMax: forecast.tomorrow.tempMax,
       hourRange: formatHourRange(winT.startHour, winT.endHour),
+      startHour: winT.startHour,
       cost: estimateCost(volume, pump),
     };
   }

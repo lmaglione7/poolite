@@ -6,6 +6,8 @@ export default function ShopLayout() {
       <Stack.Screen name="index" options={{ animation: 'fade' }} />
       <Stack.Screen name="[id]" />
       <Stack.Screen name="cart" />
+      <Stack.Screen name="scorte" />
+      <Stack.Screen name="tecnici" />
     </Stack>
   );
 }

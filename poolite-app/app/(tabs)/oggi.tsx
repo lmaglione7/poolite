@@ -7,22 +7,45 @@ import { HeroBanner } from '../../src/components/HeroBanner';
 import { Card } from '../../src/components/Card';
 import { PrimaryButton } from '../../src/components/PrimaryButton';
 import { DealCardCompact } from '../../src/components/shop/DealCardCompact';
+import { ZoneCard } from '../../src/components/ZoneCard';
 import { colors } from '../../src/theme/colors';
 import { usePoolProfile } from '../../src/state/PoolProfileContext';
 import { useWeatherCost } from '../../src/hooks/useWeatherCost';
+import { useWaterState } from '../../src/hooks/useWaterState';
 import { useCatalog } from '../../src/hooks/useCatalog';
 import { formatEuro } from '../../src/data/products';
+import { getZoneStats } from '../../src/lib/zoneStats';
+import { schedulePumpWindowNotifications } from '../../src/lib/notifications';
+import { updateSalvadanaioWidget } from '../../src/lib/widgetBridge';
 
 export default function OggiTab() {
   const profile = usePoolProfile();
-  const { loading, netError, today, cityName, retry } = useWeatherCost();
+  const { loading, netError, today, tomorrow, cityName, retry } = useWeatherCost();
+  const { score } = useWaterState();
   const { products } = useCatalog();
   const deals = products.filter((p) => p.old);
+  const zone = today ? getZoneStats(cityName, today.cost.costToday, score) : null;
 
   useEffect(() => {
-    if (today) profile.addSavings(today.cost.savingsToday);
+    if (!today) return;
+    profile.addSavings(today.cost.savingsToday);
+    const plans = [today, tomorrow]
+      .filter((p): p is NonNullable<typeof p> => !!p)
+      .map((p) => ({ dateISO: p.dateISO, startHour: p.startHour, savings: p.cost.savingsToday }));
+    schedulePumpWindowNotifications(plans);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [today?.cost.savingsToday]);
+  }, [today?.dateISO, today?.startHour]);
+
+  useEffect(() => {
+    if (!profile.loading) {
+      updateSalvadanaioWidget({
+        cumulativeSavings: profile.cumulativeSavings,
+        savedToday: today?.cost.savingsToday ?? 0,
+        days: profile.daysSinceOnboarding,
+        streak: profile.streak,
+      });
+    }
+  }, [profile.cumulativeSavings, profile.loading, profile.daysSinceOnboarding, profile.streak, today?.cost.savingsToday]);
 
   return (
     <TabScreen onRefresh={retry} refreshing={loading}>
@@ -88,6 +111,7 @@ export default function OggiTab() {
               />
             </View>
           </Card>
+          {zone && <ZoneCard stats={zone} />}
         </>
       ) : null}
 

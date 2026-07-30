@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "it.poolite.app"
+      "bundleIdentifier": "it.poolite.app",
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.it.poolite.app"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,6 +31,8 @@
     },
     "plugins": [
       "expo-router",
+      "expo-notifications",
+      "@bacons/apple-targets",
       [
         "@stripe/stripe-react-native",
         {

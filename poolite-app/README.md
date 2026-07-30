@@ -58,3 +58,42 @@ product decisions made while scoping this build:
   Stripe, once configured. Falls back to on-device demo data until then.
 - **Dev menu** (long-press the logo): the shipped equivalent of the
   prototype's "Tweaks" panel — forces net-error / acqua-verde for QA.
+
+## Engagement & marketplace v2
+
+Built on the Hooked model (trigger → action → variable reward → investment)
+and Cold Start network-effect thinking:
+
+- **Pump-window notification** (`src/lib/notifications.ts`): one daily local
+  notification at the start of the optimal window, with the day's savings —
+  the external trigger. Rescheduled from real forecast data on each app open.
+- **Weekly report + milestones**: `/report` modal (weekly savings, vs last
+  week, zone percentile) and a confetti overlay when cumulative savings cross
+  25/50/100€… (`src/components/MilestoneOverlay.tsx`). Real numbers only.
+- **Anonymous zone comparison**: "better than N% of pools in {city}" card on
+  Oggi + percentile detail on Tu. `src/lib/zoneStats.ts` derives stable
+  plausible stats until the backend can aggregate real users.
+- **Contextual verified reviews**: every review carries the reviewer's pool
+  context ("Piscina media · sale · Monza") — `src/data/reviews.ts`, table
+  `product_reviews`.
+- **Local technicians**: verified directory + free "richiedi intervento" form
+  (`shop/tecnici`, tables `technicians`/`service_requests`).
+- **Smart refills** ("Scorta automatica −10%"): frequency suggested from the
+  user's own treatment diary, pause/skip anytime (`shop/scorte`,
+  `SubscriptionsContext`, table `subscriptions`), reminder 3 days before.
+- **Next-day delivery badge** on product + cart (UI only — negotiate with the
+  supplier before enabling for real).
+
+## iOS home-screen widget (Salvadanaio)
+
+`targets/widget/` is a WidgetKit extension (via `@bacons/apple-targets`)
+showing cumulative savings, updated by the app through the shared App Group
+(`src/lib/widgetBridge.ts`). It requires a **development build** — it does
+not exist in Expo Go or on web:
+
+```sh
+npx expo prebuild -p ios --clean
+npx expo run:ios   # needs Xcode; set your Apple team in app.json if prompted
+```
+
+The bridge no-ops safely everywhere the native module is absent.

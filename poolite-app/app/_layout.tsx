@@ -6,8 +6,10 @@ import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from '../src/state/AuthContext';
 import { PoolProfileProvider } from '../src/state/PoolProfileContext';
 import { CartProvider } from '../src/state/CartContext';
+import { SubscriptionsProvider } from '../src/state/SubscriptionsContext';
 import { DevStateProvider } from '../src/state/DevStateContext';
 import { AppStripeProvider } from '../src/components/AppStripeProvider';
+import { MilestoneOverlay } from '../src/components/MilestoneOverlay';
 import { colors } from '../src/theme/colors';
 
 function Providers({ children }: { children: React.ReactNode }) {
@@ -15,9 +17,11 @@ function Providers({ children }: { children: React.ReactNode }) {
     <AuthProvider>
       <PoolProfileProvider>
         <CartProvider>
-          <DevStateProvider>
-            <AppStripeProvider>{children}</AppStripeProvider>
-          </DevStateProvider>
+          <SubscriptionsProvider>
+            <DevStateProvider>
+              <AppStripeProvider>{children}</AppStripeProvider>
+            </DevStateProvider>
+          </SubscriptionsProvider>
         </CartProvider>
       </PoolProfileProvider>
     </AuthProvider>
@@ -43,8 +47,10 @@ export default function RootLayout() {
             <Stack.Screen name="loading" />
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="report" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="dev-menu" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
           </Stack>
+          <MilestoneOverlay />
         </Providers>
       </SafeAreaProvider>
     </GestureHandlerRootView>

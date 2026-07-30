@@ -3,7 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export async function loadJSON<T>(key: string, fallback: T): Promise<T> {
   try {
     const raw = await AsyncStorage.getItem(key);
-    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(fallback)) {
+      return (Array.isArray(parsed) ? parsed : fallback) as T;
+    }
+    return { ...fallback, ...parsed };
   } catch {
     return fallback;
   }

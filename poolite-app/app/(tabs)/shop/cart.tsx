@@ -115,6 +115,9 @@ export default function CartScreen() {
               <Text style={styles.totalValue}>{formatEuro(total)}</Text>
             </View>
             <PrimaryButton label={busy ? 'Un attimo…' : "Concludi l'ordine"} onPress={checkout} disabled={busy} style={{ marginTop: 12 }} />
+            <View style={styles.nextDayBadge}>
+              <Text style={styles.nextDayText}>🚚 Ordina entro le 12:00 → arriva domani</Text>
+            </View>
             <Text style={styles.footnote}>Consegna gratis sopra i 39 € · resi facili entro 30 giorni</Text>
           </>
         )}
@@ -144,5 +147,7 @@ const styles = StyleSheet.create({
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: 18, paddingHorizontal: 4 },
   totalLabel: { fontSize: 15, color: colors.textSecondary, fontWeight: '700' },
   totalValue: { fontSize: 26, fontWeight: '800', color: colors.primary },
-  footnote: { marginTop: 10, textAlign: 'center', fontSize: 12, color: colors.textSecondary },
+  footnote: { marginTop: 8, textAlign: 'center', fontSize: 12, color: colors.textSecondary },
+  nextDayBadge: { marginTop: 10, alignSelf: 'center', backgroundColor: colors.selectedBg, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 },
+  nextDayText: { fontSize: 13, fontWeight: '700', color: colors.primary },
 });

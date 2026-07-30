@@ -4,15 +4,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PressableScale } from '../../../src/components/PressableScale';
 import { ProductImage } from '../../../src/components/ProductImage';
 import { CartButton } from '../../../src/components/shop/CartButton';
+import { Card } from '../../../src/components/Card';
 import { colors } from '../../../src/theme/colors';
 import { useCatalog } from '../../../src/hooks/useCatalog';
 import { useCart } from '../../../src/state/CartContext';
+import { useSubscriptions, SUBSCRIPTION_DISCOUNT } from '../../../src/state/SubscriptionsContext';
 import { formatEuro, pctOff, starString } from '../../../src/data/products';
+import { reviewsForProduct } from '../../../src/data/reviews';
+import { scheduleSubscriptionReminder } from '../../../src/lib/notifications';
 
 export default function ProductDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { byId } = useCatalog();
   const cart = useCart();
+  const subs = useSubscriptions();
   const product = byId[id ?? ''];
 
   if (!product) {
@@ -24,6 +29,21 @@ export default function ProductDetail() {
   }
 
   const inCart = !!cart.cart[product.id];
+  const subscribed = subs.isSubscribed(product.id);
+  const suggestedWeeks = subs.suggestedWeeks(product.id);
+  const reviews = reviewsForProduct(product.id);
+  const subscribable = ['chimici', 'accessori'].includes(product.cat);
+
+  function toggleSubscription() {
+    if (subscribed) {
+      subs.unsubscribe(product.id);
+    } else {
+      subs.subscribe(product.id);
+      const next = new Date();
+      next.setDate(next.getDate() + suggestedWeeks * 7);
+      scheduleSubscriptionReminder(product.name, next.toISOString().slice(0, 10));
+    }
+  }
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
@@ -74,7 +94,63 @@ export default function ProductDetail() {
               {inCart ? `Nel carrello ✓ · ${cart.cart[product.id]}` : 'Ordina con sconto Poolite'}
             </Text>
           </PressableScale>
+          <View style={styles.nextDayBadge}>
+            <Text style={styles.nextDayText}>🚚 Ordina entro le 12:00 → arriva domani</Text>
+          </View>
           <Text style={styles.footnote}>Consegna gratis sopra i 39 € · resi facili entro 30 giorni</Text>
+
+          {subscribable && (
+            <Card tone={subscribed ? 'selected' : 'amber'} style={{ marginTop: 16 }}>
+              <View style={styles.subHeaderRow}>
+                <Text style={{ fontSize: 22 }}>📦</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.subTitle}>Scorta automatica −10%</Text>
+                  <Text style={styles.subBody}>
+                    {subscribed
+                      ? `Attiva: arriva ogni ${subs.getSubscription(product.id)?.weeks ?? suggestedWeeks} settimane a ${formatEuro(product.price * (1 - SUBSCRIPTION_DISCOUNT))}. Gestiscila da "Le tue scorte".`
+                      : `Al ritmo dei tuoi trattamenti ti serve ogni ~${suggestedWeeks} settimane. Te la mando io a ${formatEuro(product.price * (1 - SUBSCRIPTION_DISCOUNT))}, salti o metti in pausa quando vuoi.`}
+                  </Text>
+                </View>
+              </View>
+              <PressableScale
+                onPress={toggleSubscription}
+                style={[styles.subBtn, { backgroundColor: subscribed ? colors.card : colors.primary, borderWidth: subscribed ? 1 : 0, borderColor: colors.border }]}
+              >
+                <Text style={[styles.subBtnText, { color: subscribed ? colors.error : '#FFFFFF' }]}>
+                  {subscribed ? 'Disattiva scorta' : 'Attiva la scorta automatica'}
+                </Text>
+              </PressableScale>
+            </Card>
+          )}
+
+          {reviews.length > 0 && (
+            <View style={{ marginTop: 20 }}>
+              <Text style={styles.reviewsTitle}>Recensioni di piscine come la tua</Text>
+              <Text style={styles.reviewsSub}>Solo da chi ha comprato davvero, con la sua piscina accanto.</Text>
+              <View style={{ gap: 10, marginTop: 10 }}>
+                {reviews.map((r) => (
+                  <Card key={r.id} soft>
+                    <View style={styles.reviewHeader}>
+                      <Text style={styles.reviewAuthor}>{r.author}</Text>
+                      {r.verified && (
+                        <View style={styles.verifiedBadge}>
+                          <Text style={styles.verifiedText}>✓ Acquisto verificato</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={styles.reviewStars}>{starString(r.rating)}</Text>
+                    <Text style={styles.reviewText}>{r.text}</Text>
+                    <View style={styles.reviewContextPill}>
+                      <Text style={styles.reviewContextText}>🏊 {r.poolContext}</Text>
+                    </View>
+                    <Text style={styles.reviewMeta}>
+                      utile per {r.helpfulCount} persone · {r.monthsAgo === 1 ? 'un mese fa' : `${r.monthsAgo} mesi fa`}
+                    </Text>
+                  </Card>
+                ))}
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -102,5 +178,23 @@ const styles = StyleSheet.create({
   onlyWith: { fontSize: 13, fontWeight: '800', color: colors.amber },
   addBtn: { marginTop: 16, borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
   addBtnText: { fontWeight: '800', fontSize: 16 },
-  footnote: { marginTop: 10, textAlign: 'center', fontSize: 12, color: colors.textSecondary },
+  footnote: { marginTop: 8, textAlign: 'center', fontSize: 12, color: colors.textSecondary },
+  nextDayBadge: { marginTop: 10, alignSelf: 'center', backgroundColor: colors.selectedBg, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 },
+  nextDayText: { fontSize: 13, fontWeight: '700', color: colors.primary },
+  subHeaderRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
+  subTitle: { fontWeight: '800', fontSize: 15, color: colors.textPrimary },
+  subBody: { fontSize: 13, color: colors.textSecondary, marginTop: 3, lineHeight: 18 },
+  subBtn: { marginTop: 12, borderRadius: 14, paddingVertical: 12, alignItems: 'center' },
+  subBtnText: { fontWeight: '800', fontSize: 14 },
+  reviewsTitle: { fontWeight: '800', fontSize: 17, color: colors.textPrimary },
+  reviewsSub: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
+  reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  reviewAuthor: { fontWeight: '800', fontSize: 14, color: colors.textPrimary },
+  verifiedBadge: { backgroundColor: colors.selectedBg, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+  verifiedText: { fontSize: 11, fontWeight: '700', color: colors.primary },
+  reviewStars: { fontSize: 13, color: colors.accent, marginTop: 4 },
+  reviewText: { fontSize: 14, color: colors.textPrimary, marginTop: 6, lineHeight: 20 },
+  reviewContextPill: { alignSelf: 'flex-start', backgroundColor: colors.background, borderWidth: 1, borderColor: colors.border, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, marginTop: 8 },
+  reviewContextText: { fontSize: 12, color: colors.textSecondary, fontWeight: '600' },
+  reviewMeta: { fontSize: 11, color: colors.textSecondary, marginTop: 6 },
 });

@@ -7,7 +7,11 @@ import { PressableScale } from '../../src/components/PressableScale';
 import { colors } from '../../src/theme/colors';
 import { usePoolProfile } from '../../src/state/PoolProfileContext';
 import { useAuth } from '../../src/state/AuthContext';
+import { useSubscriptions } from '../../src/state/SubscriptionsContext';
 import { useCatalog } from '../../src/hooks/useCatalog';
+import { useWeatherCost } from '../../src/hooks/useWeatherCost';
+import { useWaterState } from '../../src/hooks/useWaterState';
+import { getZoneStats } from '../../src/lib/zoneStats';
 import { formatEuro } from '../../src/data/products';
 
 function knowPercent(profile: ReturnType<typeof usePoolProfile>): number {
@@ -31,10 +35,15 @@ const SIZE_LABELS: Record<string, string> = {
 export default function TuTab() {
   const profile = usePoolProfile();
   const auth = useAuth();
-  const { products } = useCatalog();
+  const subs = useSubscriptions();
+  const { products, byId } = useCatalog();
+  const { today, cityName } = useWeatherCost();
+  const { score } = useWaterState();
   const dealsCount = products.filter((p) => p.old).length;
   const know = knowPercent(profile);
   const firstDay = profile.daysSinceOnboarding === 0;
+  const zone = getZoneStats(cityName, today?.cost.costToday ?? 2.4, score);
+  const activeSubs = subs.subscriptions.filter((s) => !s.paused);
 
   const sizeLabel =
     profile.size === 'custom'
@@ -64,7 +73,46 @@ export default function TuTab() {
             ? 'Il salvadanaio parte oggi 🌱 Da domani vedrai qui gli euro che ti faccio risparmiare.'
             : `risparmiati in ${profile.daysSinceOnboarding} giorni, senza fare niente`}
         </Text>
+        <PressableScale haptic={false} onPress={() => router.push('/report')}>
+          <Text style={styles.reportLink}>Vedi il report della settimana ›</Text>
+        </PressableScale>
       </Card>
+
+      <Card soft style={{ marginTop: 12 }}>
+        <Text style={styles.zoneHeader}>La tua zona · {zone.city}</Text>
+        <View style={styles.zoneRow}>
+          <View style={styles.zoneStat}>
+            <Text style={styles.zoneStatValue}>{zone.costPercentile}%</Text>
+            <Text style={styles.zoneStatLabel}>piscine battute sul costo</Text>
+          </View>
+          <View style={styles.zoneStat}>
+            <Text style={styles.zoneStatValue}>{formatEuro(zone.avgDailyCost)}</Text>
+            <Text style={styles.zoneStatLabel}>spesa media di zona/giorno</Text>
+          </View>
+          <View style={styles.zoneStat}>
+            <Text style={[styles.zoneStatValue, { color: score >= zone.avgWaterScore ? colors.accent : colors.amber }]}>
+              {score} vs {zone.avgWaterScore}
+            </Text>
+            <Text style={styles.zoneStatLabel}>punteggio acqua vs media</Text>
+          </View>
+        </View>
+        <Text style={styles.zoneFootnote}>Confronto anonimo con {zone.poolsInZone} piscine simili alla tua in zona</Text>
+      </Card>
+
+      <PressableScale scaleTo={0.98} onPress={() => router.push('/(tabs)/shop/scorte')}>
+        <Card soft style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 12 }}>
+          <Text style={{ fontSize: 26 }}>📦</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.dealsTitle}>Le tue scorte automatiche</Text>
+            <Text style={styles.dealsSub}>
+              {activeSubs.length === 0
+                ? 'Nessuna attiva — risparmi il 10% su ogni scorta'
+                : `${activeSubs.length} attiv${activeSubs.length === 1 ? 'a' : 'e'} · prossima: ${byId[activeSubs[0].productId]?.name ?? ''}`}
+            </Text>
+          </View>
+          <Text style={styles.chevron}>›</Text>
+        </Card>
+      </PressableScale>
 
       <View style={styles.statsRow}>
         <Card soft style={styles.statCard}>
@@ -145,6 +193,13 @@ const styles = StyleSheet.create({
   piggyLabel: { fontSize: 13, color: colors.textSecondary, fontWeight: '700' },
   piggyAmount: { fontSize: 54, fontWeight: '800', color: colors.amber, letterSpacing: -2, marginVertical: 4 },
   piggySub: { fontSize: 14, color: colors.textSecondary, textAlign: 'center' },
+  reportLink: { marginTop: 10, fontSize: 13, color: colors.accent, fontWeight: '700' },
+  zoneHeader: { fontWeight: '800', fontSize: 15, color: colors.textPrimary, marginBottom: 12 },
+  zoneRow: { flexDirection: 'row', gap: 8 },
+  zoneStat: { flex: 1, alignItems: 'center' },
+  zoneStatValue: { fontSize: 16, fontWeight: '800', color: colors.accent, textAlign: 'center' },
+  zoneStatLabel: { fontSize: 11, color: colors.textSecondary, textAlign: 'center', marginTop: 3, lineHeight: 14 },
+  zoneFootnote: { fontSize: 11, color: colors.textSecondary, textAlign: 'center', marginTop: 12 },
   statsRow: { flexDirection: 'row', gap: 12, marginTop: 12 },
   statCard: { flex: 1, alignItems: 'center' },
   statValue: { fontSize: 26, fontWeight: '800', color: colors.primary },

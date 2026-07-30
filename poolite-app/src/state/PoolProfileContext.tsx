@@ -14,6 +14,11 @@ export interface TreatmentLogEntry {
   whenISO: string;
 }
 
+export interface SavingsDay {
+  dateISO: string;
+  amount: number;
+}
+
 interface ProfileState {
   hasOnboarded: boolean;
   size: PoolSize | null;
@@ -30,6 +35,8 @@ interface ProfileState {
   waterAnswer: { value: WaterColor; dateISO: string } | null;
   treatmentLogs: TreatmentLogEntry[];
   cumulativeSavings: number;
+  savingsHistory: SavingsDay[];
+  lastMilestone: number;
 }
 
 const STORAGE_KEY = 'poolite.profile.v1';
@@ -54,7 +61,12 @@ const DEFAULT_STATE: ProfileState = {
     { id: 'seed-3', name: 'Antialghe', emoji: '🌿', whenISO: daysAgoISO(12) },
   ],
   cumulativeSavings: 0,
+  savingsHistory: [],
+  lastMilestone: 0,
 };
+
+// Celebrated in ascending order as cumulativeSavings crosses each one.
+export const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
 
 function daysAgoISO(n: number) {
   const d = new Date();
@@ -87,6 +99,8 @@ interface ProfileApi extends ProfileState {
   addSavings: (amountToday: number) => void;
   restart: () => void;
   daysSinceOnboarding: number;
+  pendingMilestone: number | null;
+  celebrateMilestone: () => void;
 }
 
 const ProfileContext = createContext<ProfileApi | null>(null);
@@ -183,7 +197,21 @@ export function PoolProfileProvider({ children }: { children: ReactNode }) {
       addSavings: (amountToday) =>
         setState((s) => {
           if (s.lastActiveDateISO === todayKey()) return s; // already accrued today
-          return { ...s, cumulativeSavings: s.cumulativeSavings + amountToday, lastActiveDateISO: todayKey() };
+          return {
+            ...s,
+            cumulativeSavings: s.cumulativeSavings + amountToday,
+            savingsHistory: [...s.savingsHistory, { dateISO: todayKey(), amount: amountToday }].slice(-90),
+            lastActiveDateISO: todayKey(),
+          };
+        }),
+      pendingMilestone: (() => {
+        const next = MILESTONES.find((m) => m > state.lastMilestone && state.cumulativeSavings >= m);
+        return next ?? null;
+      })(),
+      celebrateMilestone: () =>
+        setState((s) => {
+          const next = MILESTONES.find((m) => m > s.lastMilestone && s.cumulativeSavings >= m);
+          return next ? { ...s, lastMilestone: next } : s;
         }),
       restart: () =>
         setState((s) => ({

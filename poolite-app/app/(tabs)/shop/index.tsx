@@ -10,10 +10,13 @@ import { CategoryTile } from '../../../src/components/shop/CategoryTile';
 import { NeedNowCard } from '../../../src/components/shop/NeedNowCard';
 import { DealCardRated } from '../../../src/components/shop/DealCardRated';
 import { CatalogCard } from '../../../src/components/shop/CatalogCard';
+import { PressableScale } from '../../../src/components/PressableScale';
 import { colors } from '../../../src/theme/colors';
 import { useCatalog } from '../../../src/hooks/useCatalog';
 import { useWaterState } from '../../../src/hooks/useWaterState';
-import { CATEGORIES, ProductCategory } from '../../../src/data/products';
+import { CATEGORIES, ProductCategory, starString } from '../../../src/data/products';
+import { TECHNICIANS } from '../../../src/data/technicians';
+import { router } from 'expo-router';
 
 const WHY_BY_ID: Record<string, string> = {
   shock: '💡 Hai detto che l’acqua è verdina: serve un trattamento shock, subito.',
@@ -102,6 +105,29 @@ export default function ShopHome() {
           ))}
         </ScrollView>
 
+        <View style={styles.techHeaderRow}>
+          <Text style={styles.sectionTitle}>Tecnici di zona</Text>
+          <Text onPress={() => router.push('/(tabs)/shop/tecnici')} style={styles.techLink}>
+            Vedi tutti ›
+          </Text>
+        </View>
+        <PressableScale scaleTo={0.98} onPress={() => router.push('/(tabs)/shop/tecnici')}>
+          <Card soft style={{ marginTop: 10 }}>
+            <View style={styles.techRow}>
+              <Text style={{ fontSize: 28 }}>{TECHNICIANS[0].emoji}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.techName} numberOfLines={1}>{TECHNICIANS[0].name}</Text>
+                <Text style={styles.techMeta}>
+                  <Text style={{ color: colors.accent }}>{starString(TECHNICIANS[0].rating)}</Text> {TECHNICIANS[0].rating.toFixed(1).replace('.', ',')} ·{' '}
+                  {TECHNICIANS[0].specialty}
+                </Text>
+                <Text style={styles.techSub}>+{TECHNICIANS.length - 1} altri professionisti verificati vicino a te · richiesta gratuita</Text>
+              </View>
+              <Text style={styles.techChevron}>›</Text>
+            </View>
+          </Card>
+        </PressableScale>
+
         <View style={styles.catalogHeader}>
           <Text style={styles.sectionTitle}>{activeCategory ? activeCategory.label : 'Dal catalogo Rio'}</Text>
           {activeCategory && (
@@ -138,6 +164,13 @@ const styles = StyleSheet.create({
   dealsTitle: { fontWeight: '800', fontSize: 15, color: colors.textPrimary, letterSpacing: 0.5 },
   dealsTag: { fontSize: 12, fontWeight: '800', color: colors.amber },
   dealsRow: { gap: 10, paddingVertical: 10, paddingHorizontal: 2 },
+  techHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: 18, paddingHorizontal: 4 },
+  techLink: { fontSize: 13, color: colors.accent, fontWeight: '700' },
+  techRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  techName: { fontWeight: '800', fontSize: 14, color: colors.textPrimary },
+  techMeta: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  techSub: { fontSize: 12, color: colors.accent, fontWeight: '600', marginTop: 3 },
+  techChevron: { color: colors.accent, fontWeight: '800', fontSize: 18 },
   catalogHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: 18, paddingHorizontal: 4 },
   clearCat: { fontSize: 12, color: colors.accent, fontWeight: '800' },
   catalogGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 10 },
