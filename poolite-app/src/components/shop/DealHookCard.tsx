@@ -10,7 +10,7 @@ import { colors } from '../../theme/colors';
 export function DealHookCard({ product, label }: { product: Product; label: string }) {
   return (
     <PressableScale scaleTo={0.98} onPress={() => router.push(`/(tabs)/shop/${product.id}`)} style={styles.card}>
-      <ProductImage productId={product.id} width={52} height={52} radius={14} />
+      <ProductImage productId={product.id} imageUrl={product.imageUrl} width={52} height={52} radius={14} />
       <View style={{ flex: 1 }}>
         <Text style={styles.label} numberOfLines={1}>
           {label} {pctOff(product)}

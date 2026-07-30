@@ -49,7 +49,7 @@ export default function ScorteScreen() {
               return (
                 <Card key={s.productId} soft style={s.paused ? { opacity: 0.65 } : undefined}>
                   <View style={styles.subRow}>
-                    <ProductImage productId={product.id} width={52} height={52} radius={14} />
+                    <ProductImage productId={product.id} imageUrl={product.imageUrl} width={52} height={52} radius={14} />
                     <View style={{ flex: 1 }}>
                       <Text style={styles.subName} numberOfLines={1}>{product.name}</Text>
                       <Text style={styles.subMeta}>

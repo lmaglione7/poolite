@@ -28,6 +28,7 @@ export function useCatalog() {
             old: r.old_price != null ? Number(r.old_price) : null,
             badge: r.badge,
             desc: r.description,
+            imageUrl: r.image_url ?? null,
           }))
         );
       }

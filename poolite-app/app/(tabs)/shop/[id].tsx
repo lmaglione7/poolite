@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PressableScale } from '../../../src/components/PressableScale';
 import { ProductImage } from '../../../src/components/ProductImage';
 import { CartButton } from '../../../src/components/shop/CartButton';
+import { TrustRow } from '../../../src/components/shop/TrustRow';
 import { Card } from '../../../src/components/Card';
 import { colors } from '../../../src/theme/colors';
 import { useCatalog } from '../../../src/hooks/useCatalog';
@@ -56,7 +57,7 @@ export default function ProductDetail() {
         </View>
 
         <View style={styles.heroWrap}>
-          <ProductImage productId={product.id} width={400} height={200} radius={24} style={{ width: '100%' }} />
+          <ProductImage productId={product.id} imageUrl={product.imageUrl} width={400} height={200} radius={24} style={{ width: '100%' }} />
           {product.old && (
             <View style={styles.pctBadge}>
               <Text style={styles.pctText}>{pctOff(product)}</Text>
@@ -97,7 +98,20 @@ export default function ProductDetail() {
           <View style={styles.nextDayBadge}>
             <Text style={styles.nextDayText}>🚚 Ordina entro le 12:00 → arriva domani</Text>
           </View>
-          <Text style={styles.footnote}>Consegna gratis sopra i 39 € · resi facili entro 30 giorni</Text>
+          <Text style={styles.footnote}>Consegna gratis sopra i 39 € · express gratuita sopra i 99 € · resi entro 30 giorni</Text>
+
+          <PressableScale scaleTo={0.98} onPress={() => router.push(`/manuale/${product.id}`)}>
+            <Card soft style={{ marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <Text style={{ fontSize: 26 }}>📖</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.manualTitle}>Manuale passo-passo</Text>
+                <Text style={styles.manualSub}>Come si usa, spiegato semplice. Niente lasciato al caso.</Text>
+              </View>
+              <Text style={styles.manualChevron}>›</Text>
+            </Card>
+          </PressableScale>
+
+          <TrustRow style={{ marginTop: 14 }} />
 
           {subscribable && (
             <Card tone={subscribed ? 'selected' : 'amber'} style={{ marginTop: 16 }}>
@@ -181,6 +195,9 @@ const styles = StyleSheet.create({
   footnote: { marginTop: 8, textAlign: 'center', fontSize: 12, color: colors.textSecondary },
   nextDayBadge: { marginTop: 10, alignSelf: 'center', backgroundColor: colors.selectedBg, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 },
   nextDayText: { fontSize: 13, fontWeight: '700', color: colors.primary },
+  manualTitle: { fontWeight: '800', fontSize: 15, color: colors.textPrimary },
+  manualSub: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
+  manualChevron: { color: colors.accent, fontWeight: '800', fontSize: 18 },
   subHeaderRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   subTitle: { fontWeight: '800', fontSize: 15, color: colors.textPrimary },
   subBody: { fontSize: 13, color: colors.textSecondary, marginTop: 3, lineHeight: 18 },

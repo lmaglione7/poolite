@@ -12,7 +12,7 @@ export function CatalogCard({ product }: { product: Product }) {
   return (
     <PressableScale scaleTo={0.98} onPress={() => router.push(`/(tabs)/shop/${product.id}`)} style={styles.card}>
       <View style={styles.imageWrap}>
-        <ProductImage productId={product.id} width={200} height={78} radius={14} style={{ width: '100%' }} />
+        <ProductImage productId={product.id} imageUrl={product.imageUrl} width={200} height={78} radius={14} style={{ width: '100%' }} />
         {product.old && (
           <View style={styles.pctBadge}>
             <Text style={styles.pctText}>{pctOff(product)}</Text>

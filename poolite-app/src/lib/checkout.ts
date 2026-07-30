@@ -9,7 +9,8 @@ export interface CreatePaymentIntentResult {
  * server-side, creates the `orders`/`order_items` rows, and returns a Stripe
  * PaymentIntent client secret for the PaymentSheet. */
 export async function createPaymentIntent(
-  items: { product_id: string; qty: number }[]
+  items: { product_id: string; qty: number }[],
+  couponCode?: string | null
 ): Promise<CreatePaymentIntentResult> {
   if (!supabase) throw new Error('Backend non configurato');
   const { data: sessionData } = await supabase.auth.getSession();
@@ -17,7 +18,7 @@ export async function createPaymentIntent(
   if (!token) throw new Error('Devi accedere per completare l’ordine');
 
   const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-    body: { items },
+    body: { items, couponCode: couponCode ?? null },
     headers: { Authorization: `Bearer ${token}` },
   });
   if (error) throw error;

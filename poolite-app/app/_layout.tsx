@@ -7,6 +7,8 @@ import { AuthProvider } from '../src/state/AuthContext';
 import { PoolProfileProvider } from '../src/state/PoolProfileContext';
 import { CartProvider } from '../src/state/CartContext';
 import { SubscriptionsProvider } from '../src/state/SubscriptionsContext';
+import { RewardsProvider } from '../src/state/RewardsContext';
+import { SettingsProvider } from '../src/state/SettingsContext';
 import { DevStateProvider } from '../src/state/DevStateContext';
 import { AppStripeProvider } from '../src/components/AppStripeProvider';
 import { MilestoneOverlay } from '../src/components/MilestoneOverlay';
@@ -15,15 +17,19 @@ import { colors } from '../src/theme/colors';
 function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      <PoolProfileProvider>
-        <CartProvider>
-          <SubscriptionsProvider>
-            <DevStateProvider>
-              <AppStripeProvider>{children}</AppStripeProvider>
-            </DevStateProvider>
-          </SubscriptionsProvider>
-        </CartProvider>
-      </PoolProfileProvider>
+      <SettingsProvider>
+        <PoolProfileProvider>
+          <CartProvider>
+            <SubscriptionsProvider>
+              <RewardsProvider>
+                <DevStateProvider>
+                  <AppStripeProvider>{children}</AppStripeProvider>
+                </DevStateProvider>
+              </RewardsProvider>
+            </SubscriptionsProvider>
+          </CartProvider>
+        </PoolProfileProvider>
+      </SettingsProvider>
     </AuthProvider>
   );
 }
@@ -48,6 +54,11 @@ export default function RootLayout() {
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="report" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="manuale/[id]" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="impostazioni" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="premi" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="legale/termini" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="legale/privacy" options={{ animation: 'slide_from_right' }} />
             <Stack.Screen name="dev-menu" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
           </Stack>
           <MilestoneOverlay />

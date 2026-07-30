@@ -10,7 +10,7 @@ export function DealCardCompact({ product }: { product: Product }) {
   return (
     <PressableScale scaleTo={0.97} onPress={() => router.push(`/(tabs)/shop/${product.id}`)} style={styles.card}>
       <View style={styles.topRow}>
-        <ProductImage productId={product.id} width={46} height={46} radius={12} />
+        <ProductImage productId={product.id} imageUrl={product.imageUrl} width={46} height={46} radius={12} />
         <View style={styles.pctBadge}>
           <Text style={styles.pctText}>{pctOff(product)}</Text>
         </View>

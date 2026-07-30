@@ -84,6 +84,32 @@ and Cold Start network-effect thinking:
 - **Next-day delivery badge** on product + cart (UI only — negotiate with the
   supplier before enabling for real).
 
+## Commerce, contenuti e conformità
+
+- **Foto prodotto reali**: `products.image_url` (migrazione 0004). L'app carica
+  la foto quando c'è e ricade sull'illustrazione piatta finché non ci sono —
+  basta popolare la colonna con gli URL del fornitore, nessun codice da toccare.
+- **Manuali passo-passo** (`app/manuale/[id].tsx`, dati in `src/data/manuals.ts`):
+  libretto stile IKEA/LEGO, un'azione per schermata, numero gigante, dosaggi
+  per volume piscina, avvertenze di sicurezza e consiglio finale. 13 manuali,
+  uno per prodotto.
+- **Coupon e inviti** (`RewardsContext`, `app/premi.tsx`): scala fedeltà
+  1/3/5/10/20 ordini → −5/10/15/30/50 €, più 30 € per ogni amico iscritto col
+  proprio link. Il coupon migliore si applica da solo al carrello; l'importo
+  viene **rivalidato lato server** nella edge function (mai fidarsi del client).
+- **Spedizioni e pagamenti** (`src/data/commerce.ts`): DHL, UPS, BRT, Poste
+  Italiane; carta, Apple/Google Pay, PayPal, Klarna (3 rate), Satispay.
+  Gratis sopra 39 €, **express gratis sopra 99 €**, con barra di avanzamento
+  nel carrello. I nomi sono badge testuali: i loghi ufficiali si inseriscono
+  con i media kit dei partner quando gli accordi sono firmati.
+- **Impostazioni** (`app/impostazioni.tsx`): lingua (italiano attivo, altre
+  4 predisposte), paese Italia, valuta EUR, controllo granulare delle
+  notifiche, consensi privacy (analytics e marketing **off di default**).
+- **Termini e Privacy** (`app/legale/`): bozze complete e ragionate su GDPR e
+  Codice del Consumo (recesso 30 giorni, garanzia 24 mesi, Klarna, tecnici
+  terzi, recensioni verificate). **Da far revisionare a un legale** e completare
+  con i dati societari tra `[parentesi quadre]` prima della pubblicazione.
+
 ## iOS home-screen widget (Salvadanaio)
 
 `targets/widget/` is a WidgetKit extension (via `@bacons/apple-targets`)

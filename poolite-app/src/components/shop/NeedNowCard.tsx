@@ -21,7 +21,7 @@ export function NeedNowCard({ product, why, urgent }: { product: Product; why: s
         <Text style={[styles.whyText, { color: urgent ? colors.errorText : colors.primary }]}>{why}</Text>
       </View>
       <View style={styles.row}>
-        <ProductImage productId={product.id} width={56} height={56} radius={14} />
+        <ProductImage productId={product.id} imageUrl={product.imageUrl} width={56} height={56} radius={14} />
         <View style={{ flex: 1 }}>
           <Text style={styles.name} numberOfLines={2}>
             {product.name}

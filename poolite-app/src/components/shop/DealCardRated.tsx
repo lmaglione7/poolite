@@ -16,7 +16,7 @@ export function DealCardRated({ product }: { product: Product }) {
     <View style={styles.card}>
       <PressableScale scaleTo={0.98} onPress={() => router.push(`/(tabs)/shop/${product.id}`)}>
         <View style={styles.imageWrap}>
-          <ProductImage productId={product.id} width={128} height={88} radius={14} style={{ width: '100%' }} />
+          <ProductImage productId={product.id} imageUrl={product.imageUrl} width={128} height={88} radius={14} style={{ width: '100%' }} />
           <View style={styles.pctBadge}>
             <Text style={styles.pctText}>{pctOff(product)}</Text>
           </View>

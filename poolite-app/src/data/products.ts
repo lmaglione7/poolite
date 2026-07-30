@@ -10,6 +10,9 @@ export interface Product {
   old: number | null;
   badge: string;
   desc: string;
+  /** Real product photo URL (from the `products.image_url` column). The flat
+   * illustration stays as fallback until supplier photos are loaded. */
+  imageUrl?: string | null;
 }
 
 // Local fallback catalog — mirrors supabase/migrations/0002_seed_products.sql.
