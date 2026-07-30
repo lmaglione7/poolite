@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:linear-gradient(160deg,#E7F2F5,#F4F9F6);font-family:-apple-system,"SF Pro Text",system-ui,sans-serif}
+a{color:#0E5A6D}a:hover{color:#16A0B8}
+input{outline:none}
+@keyframes plPop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes plUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes plFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes plBar{from{width:0}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:30px;box-sizing:border-box">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;position:relative;display:flex;flex-direction:column;background:#F2F8FA;color:#12313A;font-family:-apple-system,'SF Pro Text',system-ui,sans-serif;box-sizing:border-box">
+
+<!-- ══════════ ONBOARDING ══════════ -->
+<sc-if value="{{isOb}}" hint-placeholder-val="{{true}}">
+<div style="height:100%;display:flex;flex-direction:column;padding:64px 24px 34px;box-sizing:border-box">
+  <div style="display:flex;justify-content:center;padding:2px 0 12px"><img src="img/logo-poolite.svg" alt="Poolite" style="height:40px" /></div>
+  <div style="display:flex;align-items:center;height:34px">
+    <sc-if value="{{canBack}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{obBack}}" style="width:34px;height:34px;border-radius:17px;background:#FFFFFF;border:1px solid #D7E8EC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#0E5A6D;font-weight:700">‹</div>
+    </sc-if>
+    <div style="flex:1;display:flex;justify-content:center;gap:8px">
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="4">
+        <span style="width:9px;height:9px;border-radius:5px;background:{{d.bg}}"></span>
+      </sc-for>
+    </div>
+    <div style="width:34px"></div>
+  </div>
+  <div style="display:flex;gap:6px;justify-content:center;padding:18px 0 6px">
+    <sc-for list="{{wave}}" as="w" hint-placeholder-count="9"><span style="width:22px;height:6px;border-radius:3px;background:#16A0B8;opacity:{{w}}"></span></sc-for>
+  </div>
+
+  <sc-if value="{{obIs0}}" hint-placeholder-val="{{true}}">
+    <div style="animation:plUp .35s ease both">
+    <h1 style="font-size:28px;font-weight:800;color:#0E5A6D;margin:18px 0 6px;line-height:1.15;text-wrap:pretty">Quanto è grande la tua piscina?</h1>
+    <p style="margin:0 0 20px;color:#4E6B74;font-size:15px">Più o meno, a occhio. Va benissimo così 🙂</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <sc-for list="{{sizes}}" as="s" hint-placeholder-count="4">
+        <div onClick="{{s.pick}}" style-active="transform:scale(.96)" style="background:{{s.bg}};border:2px solid {{s.bc}};border-radius:20px;padding:16px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;transition:all .15s">
+          <div style="height:52px;display:flex;align-items:center"><div style="width:{{s.w}}px;height:{{s.h}}px;border-radius:50%;background:linear-gradient(180deg,#8FD4E0,#16A0B8);box-shadow:inset 0 3px 6px rgba(255,255,255,.5)"></div></div>
+          <div style="font-weight:800;font-size:16px;color:#0E5A6D">{{s.label}}</div>
+          <div style="font-size:12px;color:#4E6B74">{{s.m}}</div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{hideExact}}" hint-placeholder-val="{{true}}">
+      <div onClick="{{toggleExact}}" style="margin-top:16px;text-align:center;color:#16A0B8;font-size:14px;font-weight:600;cursor:pointer;text-decoration:underline">Preferisco inserire le misure esatte</div>
+    </sc-if>
+    <sc-if value="{{showExact}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top:16px;background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:16px">
+        <div style="display:flex;gap:10px">
+          <input value="{{dimL}}" onChange="{{setDimL}}" placeholder="Lungh. m" inputMode="decimal" style="flex:1;min-width:0;border:1px solid #D7E8EC;border-radius:12px;padding:12px 10px;font-size:15px;background:#F2F8FA;color:#12313A" />
+          <input value="{{dimW}}" onChange="{{setDimW}}" placeholder="Largh. m" inputMode="decimal" style="flex:1;min-width:0;border:1px solid #D7E8EC;border-radius:12px;padding:12px 10px;font-size:15px;background:#F2F8FA;color:#12313A" />
+          <input value="{{dimD}}" onChange="{{setDimD}}" placeholder="Prof. m" inputMode="decimal" style="flex:1;min-width:0;border:1px solid #D7E8EC;border-radius:12px;padding:12px 10px;font-size:15px;background:#F2F8FA;color:#12313A" />
+        </div>
+        <div onClick="{{useExact}}" style-active="transform:scale(.97)" style="margin-top:12px;background:#0E5A6D;color:#FFFFFF;border-radius:14px;padding:13px;text-align:center;font-weight:700;font-size:15px;cursor:pointer">Usa queste misure</div>
+      </div>
+    </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{obIs1}}" hint-placeholder-val="{{false}}">
+    <div style="animation:plUp .35s ease both">
+    <h1 style="font-size:28px;font-weight:800;color:#0E5A6D;margin:18px 0 6px;line-height:1.15">Che pompa hai?</h1>
+    <p style="margin:0 0 20px;color:#4E6B74;font-size:15px">Di solito c'è scritto sull'etichetta, vicino al filtro.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <sc-for list="{{pumps}}" as="p" hint-placeholder-count="5">
+        <div onClick="{{p.pick}}" style-active="transform:scale(.95)" style="background:{{p.bg}};border:2px solid {{p.bc}};border-radius:20px;padding:20px 8px;text-align:center;cursor:pointer;transition:all .15s">
+          <div style="font-size:22px;font-weight:800;color:#0E5A6D">{{p.hp}}</div>
+          <div style="font-size:12px;color:#4E6B74;margin-top:2px">HP</div>
+        </div>
+      </sc-for>
+    </div>
+    <div onClick="{{pickNoPump}}" style-active="transform:scale(.97)" style="margin-top:14px;background:{{noPumpBg}};border:2px solid {{noPumpBc}};border-radius:20px;padding:16px;text-align:center;cursor:pointer;font-weight:700;font-size:16px;color:#0E5A6D;transition:all .15s">Non lo so 🤷</div>
+    <p style="margin:10px 4px 0;color:#4E6B74;font-size:13px;text-align:center">Se non lo sai, faccio io: parto da una pompa da 1 HP, la più comune.</p>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{obIs2}}" hint-placeholder-val="{{false}}">
+    <div style="animation:plUp .35s ease both">
+    <h1 style="font-size:28px;font-weight:800;color:#0E5A6D;margin:18px 0 6px;line-height:1.15">Dove si trova la piscina?</h1>
+    <p style="margin:0 0 20px;color:#4E6B74;font-size:15px">Mi serve per leggere il meteo di casa tua ☀️</p>
+    <input value="{{city}}" onChange="{{setCity}}" placeholder="Scrivi la tua città…" style="width:100%;box-sizing:border-box;border:2px solid #D7E8EC;border-radius:16px;padding:16px;font-size:17px;background:#FFFFFF;color:#12313A;font-weight:600" />
+    <sc-if value="{{hasSugg}}" hint-placeholder-val="{{false}}">
+      <div style="margin-top:10px;background:#FFFFFF;border:1px solid #D7E8EC;border-radius:16px;overflow:hidden">
+        <sc-for list="{{sugg}}" as="c" hint-placeholder-count="3">
+          <div onClick="{{c.pick}}" style-hover="background:#EAF6F9" style="padding:14px 16px;font-size:16px;cursor:pointer;border-bottom:1px solid #F2F8FA;color:#12313A">📍 {{c.name}}</div>
+        </sc-for>
+      </div>
+    </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{obIs3}}" hint-placeholder-val="{{false}}">
+    <div style="animation:plUp .35s ease both">
+    <h1 style="font-size:28px;font-weight:800;color:#0E5A6D;margin:18px 0 6px;line-height:1.15">Come tieni pulita l'acqua?</h1>
+    <p style="margin:0 0 20px;color:#4E6B74;font-size:15px">Ultima domanda, promesso 🙌</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{treatments}}" as="t" hint-placeholder-count="3">
+        <div onClick="{{t.pick}}" style-active="transform:scale(.97)" style="background:{{t.bg}};border:2px solid {{t.bc}};border-radius:20px;padding:18px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all .15s">
+          <span style="font-size:26px">{{t.emoji}}</span>
+          <div><div style="font-weight:800;font-size:17px;color:#0E5A6D">{{t.label}}</div><div style="font-size:13px;color:#4E6B74">{{t.sub}}</div></div>
+        </div>
+      </sc-for>
+    </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ══════════ REVEAL ══════════ -->
+<sc-if value="{{isReveal}}" hint-placeholder-val="{{false}}">
+<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 30px 40px;box-sizing:border-box;text-align:center">
+  <img src="img/logo-poolite.svg" alt="Poolite" style="height:36px;margin-bottom:18px" />
+  <div style="font-size:64px;animation:plPop .6s ease both">💧</div>
+  <div style="margin-top:10px;background:#EAF6F9;border:1px solid #B9E2EA;color:#0E5A6D;border-radius:999px;padding:8px 18px;font-weight:800;font-size:15px;animation:plUp .5s .2s ease both">+50 gocce di benvenuto</div>
+  <div style="display:flex;gap:6px;justify-content:center;padding:26px 0 22px;animation:plUp .5s .35s ease both">
+    <sc-for list="{{wave}}" as="w" hint-placeholder-count="9"><span style="width:22px;height:6px;border-radius:3px;background:#16A0B8;opacity:{{w}}"></span></sc-for>
+  </div>
+  <div style="animation:plUp .5s .5s ease both">
+    <p style="margin:0;color:#4E6B74;font-size:17px">La tua piscina ti costa circa</p>
+    <div style="font-size:72px;font-weight:800;color:#0E5A6D;letter-spacing:-2px;margin:6px 0">{{revealCost}}</div>
+    <p style="margin:0;color:#4E6B74;font-size:17px">al giorno.</p>
+    <p style="margin:18px 0 0;font-size:19px;font-weight:700;color:#12313A;text-wrap:pretty">Posso fartene risparmiare <span style="color:#E8A13C">quasi uno</span>.</p>
+  </div>
+  <div onClick="{{goApp}}" style-active="transform:scale(.97)" style="margin-top:36px;background:#0E5A6D;color:#FFFFFF;border-radius:18px;padding:17px 46px;font-weight:800;font-size:17px;cursor:pointer;box-shadow:0 8px 20px rgba(14,90,109,.25);animation:plUp .5s .7s ease both">Fammi vedere</div>
+</div>
+</sc-if>
+
+<!-- ══════════ LOADING ══════════ -->
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 40px">
+  <img src="img/logo-poolite.svg" alt="Poolite" style="height:36px;margin-bottom:10px" />
+  <div style="font-size:52px;animation:plFloat 1.6s ease-in-out infinite">☀️</div>
+  <div style="font-size:19px;font-weight:700;color:#0E5A6D">Leggo il meteo…</div>
+  <div style="font-size:14px;color:#4E6B74">e il prezzo della corrente di oggi</div>
+</div>
+</sc-if>
+
+<!-- ══════════ APP ══════════ -->
+<sc-if value="{{isApp}}" hint-placeholder-val="{{false}}">
+<div style="flex:1;overflow-y:auto;padding:60px 18px 120px;box-sizing:border-box">
+  <div style="display:flex;justify-content:center;padding:4px 0 8px"><img src="img/logo-poolite.svg" alt="Poolite" style="height:30px" /></div>
+
+  <!-- ── OGGI ── -->
+  <sc-if value="{{tabOggi}}" hint-placeholder-val="{{true}}">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 4px 0">
+      <div style="font-size:24px;font-weight:800;color:#0E5A6D">Oggi</div>
+      <div style="font-size:13px;color:#4E6B74;font-weight:600;white-space:nowrap;flex-shrink:0">{{cityName}} · oggi max 31 °C ☀️</div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;padding:14px 0 12px">
+      <sc-for list="{{wave}}" as="w" hint-placeholder-count="9"><span style="width:22px;height:6px;border-radius:3px;background:#16A0B8;opacity:{{w}}"></span></sc-for>
+    </div>
+    <div style="height:128px;border-radius:20px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 10px rgba(14,90,109,.08)"><img src="img/hero-piscina.svg" alt="Piscina con gente che si diverte" style="width:100%;height:100%;object-fit:cover;display:block" /></div>
+
+    <sc-if value="{{netError}}" hint-placeholder-val="{{false}}">
+      <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:26px 22px;text-align:center;box-shadow:0 2px 10px rgba(14,90,109,.05)">
+        <div style="font-size:40px">🌥</div>
+        <div style="font-weight:800;font-size:18px;color:#0E5A6D;margin-top:8px">Non riesco a leggere il meteo</div>
+        <p style="margin:8px 0 0;color:#4E6B74;font-size:14px;line-height:1.5;text-wrap:pretty">Capita, nessun problema. Controlla la connessione quando puoi: intanto valgono i consigli di ieri.</p>
+        <div onClick="{{retry}}" style-active="transform:scale(.97)" style="margin-top:16px;display:inline-block;background:#0E5A6D;color:#FFFFFF;border-radius:14px;padding:12px 30px;font-weight:700;font-size:15px;cursor:pointer">Riprova</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{netOk}}" hint-placeholder-val="{{true}}">
+      <div style="text-align:center;padding:8px 0 4px">
+        <div style="font-size:15px;color:#4E6B74">Oggi la piscina ti costa</div>
+        <div style="font-size:68px;font-weight:800;color:#0E5A6D;letter-spacing:-2px;line-height:1.1;margin:2px 0">2,40 €</div>
+        <div style="font-size:14px;color:#4E6B74">con 6 ore di pompa, non una di più</div>
+      </div>
+      <div style="background:#0E5A6D;border-radius:20px;padding:18px 20px;margin-top:14px;color:#FFFFFF;box-shadow:0 6px 18px rgba(14,90,109,.2)">
+        <div style="font-size:13px;opacity:.85;font-weight:600">IL MOMENTO GIUSTO</div>
+        <div style="font-size:30px;font-weight:800;white-space:nowrap;margin-top:4px">11:00 – 19:00</div>
+        <div style="font-size:14px;opacity:.85">accendi la pompa qui</div>
+        <div style="font-size:13px;opacity:.85;margin-top:6px">☀️ Il sole scalda e la corrente costa meno: due piccioni.</div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:18px 20px;margin-top:12px;box-shadow:0 2px 10px rgba(14,90,109,.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700;font-size:15px;color:#12313A">Se andasse come fanno tutti</div>
+            <div style="font-size:13px;color:#4E6B74;margin-top:2px">pompa accesa 12 ore fisse</div>
+          </div>
+          <div style="font-size:22px;font-weight:800;color:#4E6B74;text-decoration:line-through;text-decoration-color:#C4553B">4,10 €</div>
+        </div>
+        <div style="margin-top:12px;background:#FBF3E4;border-radius:14px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:14px;font-weight:700;color:#12313A">Oggi risparmi</span>
+          <span style="font-size:20px;font-weight:800;color:#E8A13C">1,70 €</span>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:18px 20px;margin-top:12px;box-shadow:0 2px 10px rgba(14,90,109,.05)">
+        <div style="font-weight:700;font-size:15px;color:#12313A">Così, a fine mese</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px">
+          <span style="font-size:14px;color:#4E6B74">circa 71 € invece di 123 €</span>
+          <span style="font-size:18px;font-weight:800;color:#E8A13C">− 52 €</span>
+        </div>
+        <div style="margin-top:10px;height:8px;border-radius:4px;background:#EAF6F9;overflow:hidden"><div style="width:58%;height:100%;border-radius:4px;background:#16A0B8;animation:plBar 1s ease both"></div></div>
+      </div>
+    </sc-if>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:20px 4px 0">
+      <span style="font-weight:800;font-size:16px;color:#12313A">Offerte del giorno</span>
+      <span onClick="{{goShop}}" style="font-size:13px;color:#16A0B8;font-weight:700;cursor:pointer;white-space:nowrap">Vedi tutte ›</span>
+    </div>
+    <div style="display:flex;gap:10px;overflow-x:auto;margin:10px -18px 0;padding:2px 18px 6px">
+      <sc-for list="{{deals}}" as="dg" hint-placeholder-count="4">
+        <div onClick="{{dg.open}}" style-active="transform:scale(.97)" style="flex:none;width:138px;background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:12px;cursor:pointer;box-shadow:0 2px 10px rgba(14,90,109,.05)">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div role="img" aria-label="{{dg.name}}" style="width:46px;height:46px;border-radius:12px;background-image:url({{dg.img}});background-size:cover;background-position:center"></div><span style="background:#FBF3E4;color:#E8A13C;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:800">{{dg.pct}}</span></div>
+          <div style="font-weight:700;font-size:13px;color:#12313A;margin-top:8px;line-height:1.3;min-height:34px">{{dg.name}}</div>
+          <div style="display:flex;gap:5px;align-items:baseline;margin-top:4px"><span style="font-weight:800;font-size:15px;color:#0E5A6D">{{dg.priceF}}</span><span style="font-size:11px;color:#4E6B74;text-decoration:line-through">{{dg.oldF}}</span></div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- ── DOMANI ── -->
+  <sc-if value="{{tabDomani}}" hint-placeholder-val="{{false}}">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 4px 0">
+      <div style="font-size:24px;font-weight:800;color:#0E5A6D">Domani</div>
+      <div style="font-size:13px;color:#4E6B74;font-weight:600;white-space:nowrap;flex-shrink:0">giovedì 31 luglio · max 33 °C</div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;padding:14px 0 12px">
+      <sc-for list="{{wave}}" as="w" hint-placeholder-count="9"><span style="width:22px;height:6px;border-radius:3px;background:#16A0B8;opacity:{{w}}"></span></sc-for>
+    </div>
+    <sc-if value="{{netError}}" hint-placeholder-val="{{false}}">
+      <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:26px 22px;text-align:center">
+        <div style="font-size:40px">🌥</div>
+        <div style="font-weight:800;font-size:18px;color:#0E5A6D;margin-top:8px">Il piano di domani arriva appena torna la linea</div>
+        <p style="margin:8px 0 0;color:#4E6B74;font-size:14px;line-height:1.5">Nel frattempo va benissimo la fascia di oggi.</p>
+      </div>
+    </sc-if>
+    <sc-if value="{{netOk}}" hint-placeholder-val="{{true}}">
+      <div style="background:#0E5A6D;border-radius:20px;padding:22px;color:#FFFFFF;box-shadow:0 6px 18px rgba(14,90,109,.2);text-align:center">
+        <div style="font-size:13px;opacity:.85;font-weight:600">IL PIANO DI DOMANI</div>
+        <div style="font-size:40px;font-weight:800;margin:6px 0 2px;letter-spacing:-1px">10:00 – 18:00</div>
+        <div style="font-size:14px;opacity:.85">8 ore di pompa · costo stimato <b>2,10 €</b></div>
+        <div style="margin:14px auto 0;display:inline-block;background:rgba(232,161,60,.18);border:1px solid rgba(232,161,60,.5);border-radius:999px;padding:7px 16px;font-weight:800;font-size:15px;color:#F4C171">Risparmi 1,90 €</div>
+      </div>
+      <div style="background:#FBF3E4;border:1px solid #F0DDB4;border-radius:20px;padding:16px 18px;margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+        <span style="font-size:22px">🔥</span>
+        <div>
+          <div style="font-weight:800;font-size:15px;color:#12313A">Consiglio extra</div>
+          <div style="font-size:14px;color:#4E6B74;margin-top:2px;line-height:1.45;text-wrap:pretty">Giornata calda in arrivo: copri la piscina stasera e l'acqua resta pulita più a lungo.</div>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:16px 18px;margin-top:12px;box-shadow:0 2px 10px rgba(14,90,109,.05)">
+        <div style="font-weight:800;font-size:15px;color:#12313A">Perché queste ore?</div>
+        <div style="font-size:14px;color:#4E6B74;margin-top:4px;line-height:1.45;text-wrap:pretty">Domani il sole scalda di più a metà giornata e la corrente costa meno: la pompa lavora quando conviene.</div>
+      </div>
+      <div onClick="{{dealTelo.open}}" style-active="transform:scale(.98)" style="background:#FFFFFF;border:1px solid #F0DDB4;border-radius:20px;padding:16px 18px;margin-top:12px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 2px 10px rgba(232,161,60,.1)">
+        <div role="img" aria-label="{{dealTelo.name}}" style="width:52px;height:52px;border-radius:14px;background-image:url({{dealTelo.img}});background-size:cover;background-position:center;flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:800;color:#E8A13C">OFFERTA PER IL CONSIGLIO DI STASERA {{dealTelo.pct}}</div>
+          <div style="font-weight:700;font-size:14px;color:#12313A;margin-top:2px">{{dealTelo.name}}</div>
+          <div style="display:flex;gap:6px;align-items:baseline;margin-top:2px"><span style="font-weight:800;font-size:15px;color:#0E5A6D">{{dealTelo.priceF}}</span><span style="font-size:12px;color:#4E6B74;text-decoration:line-through">{{dealTelo.oldF}}</span></div>
+        </div>
+        <span style="color:#16A0B8;font-weight:800;font-size:18px">›</span>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ── ACQUA ── -->
+  <sc-if value="{{tabAcqua}}" hint-placeholder-val="{{false}}">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 4px 0">
+      <div style="font-size:24px;font-weight:800;color:#0E5A6D">La tua acqua</div>
+      <div style="font-size:13px;color:#4E6B74;font-weight:600;white-space:nowrap;flex-shrink:0">💧 {{gocce}} gocce</div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;padding:14px 0 12px">
+      <sc-for list="{{wave}}" as="w" hint-placeholder-count="9"><span style="width:22px;height:6px;border-radius:3px;background:#16A0B8;opacity:{{w}}"></span></sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;padding:6px 0 4px">
+      <div style="width:150px;height:150px;border-radius:75px;background:{{gaugeBg}};display:flex;align-items:center;justify-content:center">
+        <div style="width:122px;height:122px;border-radius:61px;background:#F2F8FA;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:44px;font-weight:800;color:{{scoreColor}};line-height:1">{{score}}</div>
+          <div style="font-size:11px;color:#4E6B74;font-weight:600;margin-top:2px">PUNTEGGIO ACQUA</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-weight:800;font-size:16px;color:{{scoreColor}}">{{scoreLabel}}</div>
+      <div style="font-size:13px;color:#4E6B74;margin-top:2px;text-align:center;max-width:280px;text-wrap:pretty">{{scoreHint}}</div>
+    </div>
+
+    <sc-if value="{{qOpen}}" hint-placeholder-val="{{true}}">
+      <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:18px;margin-top:16px;box-shadow:0 2px 10px rgba(14,90,109,.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800;font-size:16px;color:#12313A">La domanda del giorno</div>
+          <span style="background:#EAF6F9;color:#0E5A6D;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:800">+10 gocce 💧</span>
+        </div>
+        <div style="font-size:15px;color:#4E6B74;margin-top:4px">Di che colore è l'acqua oggi?</div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <sc-for list="{{qOpts}}" as="q" hint-placeholder-count="3">
+            <div onClick="{{q.pick}}" style-active="transform:scale(.95)" style="flex:1;background:#F2F8FA;border:2px solid #D7E8EC;border-radius:16px;padding:14px 6px;text-align:center;cursor:pointer;transition:all .15s">
+              <div style="font-size:24px">{{q.emoji}}</div>
+              <div style="font-weight:700;font-size:13px;color:#12313A;margin-top:4px">{{q.label}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{qDone}}" hint-placeholder-val="{{false}}">
+      <div style="background:#EAF6F9;border:1px solid #B9E2EA;border-radius:20px;padding:18px;margin-top:16px;text-align:center">
+        <div style="font-weight:800;font-size:16px;color:#0E5A6D">Fatto! +10 gocce 💧</div>
+        <div style="font-size:14px;color:#4E6B74;margin-top:4px">Domani un'altra domanda ti aspetta.</div>
+      </div>
+    </sc-if>
+
+    <div style="margin-top:18px;padding:0 4px;font-weight:800;font-size:16px;color:#12313A">Diario trattamenti</div>
+    <div style="font-size:13px;color:#4E6B74;padding:2px 4px 10px">Hai messo qualcosa in acqua? Un tap e me lo ricordo io.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <sc-for list="{{chips}}" as="ch" hint-placeholder-count="5">
+        <div onClick="{{ch.pick}}" style-active="transform:scale(.94)" style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:999px;padding:10px 16px;font-weight:700;font-size:14px;color:#0E5A6D;cursor:pointer">{{ch.emoji}} {{ch.name}}</div>
+      </sc-for>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;margin-top:14px;overflow:hidden;box-shadow:0 2px 10px rgba(14,90,109,.05)">
+      <sc-for list="{{logs}}" as="lg" hint-placeholder-count="2">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #F2F8FA">
+          <span style="font-weight:700;font-size:15px;color:#12313A">{{lg.emoji}} {{lg.name}}</span>
+          <span style="font-size:13px;color:#4E6B74">{{lg.when}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div onClick="{{dealAcqua.open}}" style-active="transform:scale(.98)" style="background:#FFFFFF;border:1px solid #F0DDB4;border-radius:20px;padding:16px 18px;margin-top:14px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 2px 10px rgba(232,161,60,.1)">
+      <div role="img" aria-label="{{dealAcqua.name}}" style="width:52px;height:52px;border-radius:14px;background-image:url({{dealAcqua.img}});background-size:cover;background-position:center;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:800;color:#E8A13C">{{dealAcquaWhy}} {{dealAcqua.pct}}</div>
+        <div style="font-weight:700;font-size:14px;color:#12313A;margin-top:2px">{{dealAcqua.name}}</div>
+        <div style="display:flex;gap:6px;align-items:baseline;margin-top:2px"><span style="font-weight:800;font-size:15px;color:#0E5A6D">{{dealAcqua.priceF}}</span><span style="font-size:12px;color:#4E6B74;text-decoration:line-through">{{dealAcqua.oldF}}</span></div>
+      </div>
+      <span style="color:#16A0B8;font-weight:800;font-size:18px">›</span>
+    </div>
+  </sc-if>
+
+  <!-- ── SHOP ── -->
+  <sc-if value="{{tabShop}}" hint-placeholder-val="{{false}}">
+
+    <sc-if value="{{shopHome}}" hint-placeholder-val="{{true}}">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 0 0">
+      <div style="flex:1;display:flex;align-items:center;gap:8px;background:#FFFFFF;border:1px solid #D7E8EC;border-radius:999px;padding:0 16px;height:42px;min-width:0"><span style="font-size:14px">🔍</span><input value="{{search}}" onChange="{{setSearch}}" placeholder="Cerca nel catalogo Rio…" style="flex:1;min-width:0;border:none;background:transparent;font-size:15px;color:#12313A" /></div>
+      <div onClick="{{openCart}}" style-active="transform:scale(.93)" style="position:relative;width:42px;height:42px;border-radius:21px;background:#FFFFFF;border:1px solid #D7E8EC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:19px;flex-shrink:0">🛒<sc-if value="{{cartBadge}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;border-radius:10px;background:#E8A13C;color:#FFFFFF;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;box-sizing:border-box">{{cartCount}}</span></sc-if></div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;padding:12px 0 10px">
+      <sc-for list="{{wave}}" as="w" hint-placeholder-count="9"><span style="width:22px;height:6px;border-radius:3px;background:#16A0B8;opacity:{{w}}"></span></sc-for>
+    </div>
+    <div style="display:flex;gap:10px;overflow-x:auto;margin:0 -18px;padding:0 18px;scroll-snap-type:x mandatory">
+      <sc-for list="{{banners}}" as="bn" hint-placeholder-count="3">
+        <div onClick="{{bn.open}}" style-active="transform:scale(.98)" style="flex:none;width:86%;scroll-snap-align:center;background:linear-gradient(120deg,#0E5A6D,#16A0B8);border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px;cursor:pointer;box-sizing:border-box">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:800;color:#F4C171;letter-spacing:.6px">{{bn.tag}}</div>
+            <div style="font-size:17px;font-weight:800;color:#FFFFFF;line-height:1.25;margin-top:4px;text-wrap:pretty">{{bn.title}}</div>
+          </div>
+          <div role="img" aria-label="{{bn.title}}" style="width:72px;height:72px;border-radius:16px;background-image:url({{bn.img}});background-size:cover;background-position:center;flex-shrink:0"></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:5px;justify-content:center;padding:10px 0 4px"><span style="width:7px;height:7px;border-radius:4px;background:#0E5A6D"></span><span style="width:7px;height:7px;border-radius:4px;background:#D7E8EC"></span><span style="width:7px;height:7px;border-radius:4px;background:#D7E8EC"></span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:6px 0 18px">
+      <sc-for list="{{cats}}" as="ct" hint-placeholder-count="6">
+        <div onClick="{{ct.pick}}" style-active="transform:scale(.95)" style="border-radius:16px;overflow:hidden;position:relative;cursor:pointer;border:2px solid {{ct.bc}};height:76px;transition:all .15s">
+          <div style="position:absolute;inset:0;background-image:url({{ct.img}});background-size:cover;background-position:center"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,90,109,0) 25%,rgba(14,90,109,.8))"></div>
+          <div style="position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:9.5px;font-weight:800;color:#FFFFFF;letter-spacing:.4px;text-transform:uppercase;padding:0 4px;line-height:1.25">{{ct.label}}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="padding:0 4px;font-weight:800;font-size:16px;color:#12313A">Ti serve ora</div>
+    <sc-if value="{{allOk}}" hint-placeholder-val="{{true}}">
+      <div style="background:#EAF6F9;border:1px solid #B9E2EA;border-radius:20px;padding:18px;margin-top:10px;text-align:center">
+        <div style="font-weight:800;font-size:15px;color:#0E5A6D">Nessuna urgenza oggi: la tua piscina è in ordine 👌</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{shopUrgent}}" hint-placeholder-val="{{false}}">
+      <div style="background:#FBEDEA;border:1px solid #E8C5BC;border-radius:20px;padding:12px 16px;margin-top:10px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:20px">⚠️</span>
+        <div style="font-size:13px;color:#8A3B29;font-weight:700;line-height:1.4">L'acqua ha bisogno di una mano oggi. Bastano questi due, nell'ordine.</div>
+      </div>
+    </sc-if>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+      <sc-for list="{{needNow}}" as="pr" hint-placeholder-count="1">
+        <div onClick="{{pr.open}}" style="background:#FFFFFF;border:1px solid {{pr.border}};border-radius:20px;padding:18px;box-shadow:0 2px 10px rgba(14,90,109,.05);cursor:pointer">
+          <div style="background:{{pr.whyBg}};border-radius:14px;padding:10px 14px;font-size:14px;font-weight:700;color:{{pr.whyColor}};line-height:1.4;text-wrap:pretty">{{pr.why}}</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+            <div role="img" aria-label="{{pr.name}}" style="width:56px;height:56px;border-radius:14px;background-image:url({{pr.img}});background-size:cover;background-position:center;flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:800;font-size:16px;color:#12313A">{{pr.name}}</div>
+              <div style="font-size:12px;color:#16A0B8;font-weight:700;margin-top:2px">{{pr.badge}}</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:baseline"><span style="font-size:18px;font-weight:800;color:#0E5A6D">{{pr.priceF}}</span><sc-if value="{{pr.hasOld}}" hint-placeholder-val="{{false}}"><span style="font-size:13px;color:#4E6B74;text-decoration:line-through">{{pr.oldF}}</span></sc-if></div>
+          </div>
+          <div onClick="{{pr.add}}" style-active="transform:scale(.97)" style="margin-top:12px;background:{{pr.btnBg}};color:{{pr.btnColor}};border-radius:14px;padding:13px;text-align:center;font-weight:800;font-size:15px;cursor:pointer;transition:all .2s">{{pr.btn}}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:20px 4px 0">
+      <span style="font-weight:800;font-size:15px;color:#12313A;letter-spacing:.5px">SCOPRI LE OFFERTE</span>
+      <span style="font-size:12px;font-weight:800;color:#E8A13C;white-space:nowrap">esclusive Poolite ✨</span>
+    </div>
+    <div style="display:flex;gap:10px;overflow-x:auto;margin:10px -18px 0;padding:2px 18px 6px">
+      <sc-for list="{{deals}}" as="dl" hint-placeholder-count="4">
+        <div style="flex:none;width:152px;background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:12px;box-shadow:0 2px 10px rgba(14,90,109,.05);display:flex;flex-direction:column">
+          <div onClick="{{dl.open}}" style="height:88px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer">
+            <div role="img" aria-label="{{dl.name}}" style="position:absolute;inset:0;background-image:url({{dl.img}});background-size:cover;background-position:center"></div>
+            <span style="position:absolute;top:6px;right:6px;background:#FBF3E4;color:#E8A13C;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:800">{{dl.pct}}</span>
+          </div>
+          <div onClick="{{dl.open}}" style="font-weight:700;font-size:13px;color:#12313A;margin-top:8px;line-height:1.3;min-height:34px;cursor:pointer">{{dl.name}}</div>
+          <div style="display:flex;gap:5px;align-items:baseline;margin-top:2px"><span style="font-weight:800;font-size:15px;color:#0E5A6D">{{dl.priceF}}</span><span style="font-size:11px;color:#4E6B74;text-decoration:line-through">{{dl.oldF}}</span></div>
+          <div style="font-size:11px;color:#16A0B8;margin-top:2px">{{dl.starStr}} <span style="color:#4E6B74;font-weight:700">{{dl.ratingF}}</span></div>
+          <div onClick="{{dl.add}}" style-active="transform:scale(.95)" style="margin-top:8px;background:{{dl.btnSBg}};border:1.5px solid #0E5A6D;color:#0E5A6D;border-radius:999px;padding:7px 4px;text-align:center;font-weight:800;font-size:10px;letter-spacing:.3px;cursor:pointer;transition:all .15s">{{dl.btnS}}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:18px 4px 0">
+      <span style="font-weight:800;font-size:16px;color:#12313A">{{catTitle}}</span>
+      <sc-if value="{{catActive}}" hint-placeholder-val="{{false}}"><span onClick="{{clearCat}}" style="font-size:12px;color:#16A0B8;font-weight:800;cursor:pointer;white-space:nowrap">✕ mostra tutto</span></sc-if>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+      <sc-for list="{{catalogo}}" as="cp" hint-placeholder-count="6">
+        <div onClick="{{cp.open}}" style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:12px;cursor:pointer;box-shadow:0 2px 10px rgba(14,90,109,.05)">
+          <div style="height:78px;border-radius:14px;overflow:hidden;position:relative"><div role="img" aria-label="{{cp.name}}" style="width:100%;height:100%;background-image:url({{cp.img}});background-size:cover;background-position:center"></div><sc-if value="{{cp.hasOld}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:6px;right:6px;background:#FBF3E4;color:#E8A13C;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:800">{{cp.pct}}</span></sc-if></div>
+          <div style="font-weight:700;font-size:13px;color:#12313A;margin-top:8px;line-height:1.3;min-height:34px">{{cp.name}}</div>
+          <div style="font-size:11px;color:#16A0B8;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{cp.badge}}</div>
+          <div style="font-size:11px;color:#16A0B8;margin-top:3px">{{cp.starStr}} <span style="color:#4E6B74;font-weight:700">{{cp.ratingF}}</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <div style="display:flex;gap:5px;align-items:baseline"><span style="font-weight:800;font-size:15px;color:#0E5A6D">{{cp.priceF}}</span><sc-if value="{{cp.hasOld}}" hint-placeholder-val="{{false}}"><span style="font-size:11px;color:#4E6B74;text-decoration:line-through">{{cp.oldF}}</span></sc-if></div>
+            <div onClick="{{cp.add}}" style-active="transform:scale(.9)" style="width:30px;height:30px;border-radius:15px;background:#0E5A6D;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;cursor:pointer;flex-shrink:0">+</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{shopProd}}" hint-placeholder-val="{{false}}">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0 0">
+      <div onClick="{{shopBack}}" style-active="transform:scale(.93)" style="width:42px;height:42px;border-radius:21px;background:#FFFFFF;border:1px solid #D7E8EC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#0E5A6D;font-weight:700">‹</div>
+      <div onClick="{{openCart}}" style-active="transform:scale(.93)" style="position:relative;width:42px;height:42px;border-radius:21px;background:#FFFFFF;border:1px solid #D7E8EC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:19px">🛒<sc-if value="{{cartBadge}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;border-radius:10px;background:#E8A13C;color:#FFFFFF;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;box-sizing:border-box">{{cartCount}}</span></sc-if></div>
+    </div>
+    <div style="height:200px;border-radius:24px;overflow:hidden;margin-top:14px;position:relative"><div role="img" aria-label="{{prod.name}}" style="width:100%;height:100%;background-image:url({{prod.img}});background-size:cover;background-position:center"></div><sc-if value="{{prod.hasOld}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:14px;right:14px;background:#FBF3E4;color:#E8A13C;border-radius:999px;padding:5px 12px;font-size:14px;font-weight:800">{{prod.pct}}</span></sc-if></div>
+    <div style="padding:16px 4px 0">
+      <div style="font-size:22px;font-weight:800;color:#12313A">{{prod.name}}</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+        <span style="font-size:12px;color:#16A0B8;font-weight:800;background:#EAF6F9;border-radius:999px;padding:4px 10px">{{prod.badge}}</span>
+        <span style="font-size:13px;color:#4E6B74"><span style="color:#16A0B8">{{prod.starStr}}</span> {{prod.ratingF}}</span>
+      </div>
+      <p style="margin:14px 0 0;font-size:15px;color:#4E6B74;line-height:1.5;text-wrap:pretty">{{prod.desc}}</p>
+      <div style="display:flex;gap:10px;align-items:baseline;margin-top:16px">
+        <span style="font-size:32px;font-weight:800;color:#0E5A6D">{{prod.priceF}}</span>
+        <sc-if value="{{prod.hasOld}}" hint-placeholder-val="{{false}}"><span style="font-size:16px;color:#4E6B74;text-decoration:line-through">{{prod.oldF}}</span><span style="font-size:13px;font-weight:800;color:#E8A13C">solo con Poolite</span></sc-if>
+      </div>
+      <div onClick="{{prod.add}}" style-active="transform:scale(.97)" style="margin-top:16px;background:{{prod.btnBg}};color:{{prod.btnColor}};border-radius:16px;padding:16px;text-align:center;font-weight:800;font-size:16px;cursor:pointer;transition:all .2s;box-shadow:0 6px 16px rgba(14,90,109,.18)">{{prod.btn}}</div>
+      <div style="margin-top:10px;text-align:center;font-size:12px;color:#4E6B74">Consegna gratis sopra i 39 € · resi facili entro 30 giorni</div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{shopCart}}" hint-placeholder-val="{{false}}">
+    <div style="display:flex;align-items:center;gap:12px;padding:6px 0 0">
+      <div onClick="{{shopBack}}" style-active="transform:scale(.93)" style="width:42px;height:42px;border-radius:21px;background:#FFFFFF;border:1px solid #D7E8EC;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#0E5A6D;font-weight:700">‹</div>
+      <div style="font-size:22px;font-weight:800;color:#0E5A6D">Carrello</div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;padding:14px 0 12px">
+      <sc-for list="{{wave}}" as="w" hint-placeholder-count="9"><span style="width:22px;height:6px;border-radius:3px;background:#16A0B8;opacity:{{w}}"></span></sc-for>
+    </div>
+    <sc-if value="{{orderDone}}" hint-placeholder-val="{{false}}">
+      <div style="background:#EAF6F9;border:1px solid #B9E2EA;border-radius:20px;padding:26px 20px;text-align:center">
+        <div style="font-size:42px;animation:plPop .5s ease both">🎉</div>
+        <div style="font-weight:800;font-size:18px;color:#0E5A6D;margin-top:8px">Ordine ricevuto!</div>
+        <p style="margin:8px 0 0;font-size:14px;color:#4E6B74;line-height:1.5">Arriva in 2–3 giorni. Ti avviso io quando parte 📦</p>
+        <div onClick="{{shopBack}}" style-active="transform:scale(.97)" style="margin-top:14px;display:inline-block;background:#0E5A6D;color:#FFFFFF;border-radius:14px;padding:12px 28px;font-weight:700;font-size:14px;cursor:pointer">Torna al negozio</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{cartEmptyMsg}}" hint-placeholder-val="{{false}}">
+      <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:26px 20px;text-align:center">
+        <div style="font-size:38px">🛒</div>
+        <div style="font-weight:800;font-size:16px;color:#0E5A6D;margin-top:8px">Il carrello è vuoto</div>
+        <div onClick="{{shopBack}}" style="margin-top:8px;font-size:14px;color:#16A0B8;font-weight:700;cursor:pointer">Guarda le offerte del giorno ›</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{hasItems}}" hint-placeholder-val="{{false}}">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{cartItems}}" as="ci" hint-placeholder-count="2">
+          <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+            <div role="img" aria-label="{{ci.name}}" style="width:52px;height:52px;border-radius:14px;background-image:url({{ci.img}});background-size:cover;background-position:center;flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:14px;color:#12313A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ci.name}}</div>
+              <div style="font-size:13px;font-weight:800;color:#0E5A6D;margin-top:2px">{{ci.lineF}}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+              <div onClick="{{ci.dec}}" style-active="transform:scale(.9)" style="width:28px;height:28px;border-radius:14px;background:#F2F8FA;border:1px solid #D7E8EC;display:flex;align-items:center;justify-content:center;font-weight:800;color:#0E5A6D;cursor:pointer">−</div>
+              <span style="font-weight:800;font-size:15px;color:#12313A;min-width:14px;text-align:center">{{ci.qty}}</span>
+              <div onClick="{{ci.inc}}" style-active="transform:scale(.9)" style="width:28px;height:28px;border-radius:14px;background:#0E5A6D;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;cursor:pointer">+</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:18px 4px 0">
+        <span style="font-size:15px;color:#4E6B74;font-weight:700">Totale</span>
+        <span style="font-size:26px;font-weight:800;color:#0E5A6D">{{cartTotalF}}</span>
+      </div>
+      <div onClick="{{checkout}}" style-active="transform:scale(.97)" style="margin-top:12px;background:#0E5A6D;color:#FFFFFF;border-radius:16px;padding:16px;text-align:center;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 6px 16px rgba(14,90,109,.18)">Concludi l'ordine</div>
+      <div style="margin-top:10px;text-align:center;font-size:12px;color:#4E6B74">Consegna gratis sopra i 39 € · resi facili entro 30 giorni</div>
+    </sc-if>
+    </sc-if>
+  </sc-if>
+
+  <!-- ── TU ── -->
+  <sc-if value="{{tabTu}}" hint-placeholder-val="{{false}}">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 4px 0">
+      <div style="font-size:24px;font-weight:800;color:#0E5A6D">Ciao 👋</div>
+      <div style="font-size:13px;color:#4E6B74;font-weight:600;white-space:nowrap;flex-shrink:0">{{cityName}}</div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;padding:14px 0 12px">
+      <sc-for list="{{wave}}" as="w" hint-placeholder-count="9"><span style="width:22px;height:6px;border-radius:3px;background:#16A0B8;opacity:{{w}}"></span></sc-for>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #F0DDB4;border-radius:20px;padding:22px;text-align:center;box-shadow:0 2px 10px rgba(232,161,60,.1)">
+      <div style="font-size:13px;color:#4E6B74;font-weight:700">IL TUO SALVADANAIO 🐷</div>
+      <div style="font-size:54px;font-weight:800;color:#E8A13C;letter-spacing:-2px;margin:4px 0">{{piggyAmount}}</div>
+      <div style="font-size:14px;color:#4E6B74;text-wrap:pretty">{{piggySub}}</div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <div style="flex:1;background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:16px;text-align:center">
+        <div style="font-size:24px">💧</div>
+        <div style="font-size:26px;font-weight:800;color:#0E5A6D">{{gocce}}</div>
+        <div style="font-size:12px;color:#4E6B74">gocce</div>
+      </div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:16px;text-align:center">
+        <div style="font-size:24px">🔥</div>
+        <div style="font-size:26px;font-weight:800;color:#0E5A6D">{{streak}}</div>
+        <div style="font-size:12px;color:#4E6B74">giorni di fila</div>
+      </div>
+    </div>
+    <div onClick="{{goShop}}" style-active="transform:scale(.98)" style="background:#FFFFFF;border:1px solid #F0DDB4;border-radius:20px;padding:16px 18px;margin-top:12px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 2px 10px rgba(232,161,60,.1)">
+      <span style="font-size:26px">🏷</span>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:15px;color:#12313A">I tuoi sconti esclusivi</div>
+        <div style="font-size:13px;color:#4E6B74;margin-top:2px">{{dealsCount}} offerte del giorno attive per te, fino a <span style="font-weight:800;color:#E8A13C">−25%</span></div>
+      </div>
+      <span style="color:#16A0B8;font-weight:800;font-size:18px">›</span>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;padding:18px;margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-weight:800;font-size:15px;color:#12313A;white-space:nowrap">Poolite ti conosce al {{knowPct}}%</div>
+      </div>
+      <div style="margin-top:10px;height:8px;border-radius:4px;background:#EAF6F9;overflow:hidden"><div style="width:{{knowPct}}%;height:100%;border-radius:4px;background:#16A0B8;animation:plBar 1s ease both"></div></div>
+      <div onClick="{{goAcqua}}" style="margin-top:10px;font-size:13px;color:#16A0B8;font-weight:700;cursor:pointer">Rispondi alla domanda del giorno per conoscerci meglio ›</div>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D7E8EC;border-radius:20px;margin-top:12px;overflow:hidden">
+      <div style="padding:14px 18px;font-weight:800;font-size:15px;color:#12313A;border-bottom:1px solid #F2F8FA">La tua piscina</div>
+      <sc-for list="{{poolData}}" as="pd" hint-placeholder-count="4">
+        <div style="display:flex;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #F2F8FA">
+          <span style="font-size:14px;color:#4E6B74">{{pd.k}}</span>
+          <span style="font-size:14px;font-weight:700;color:#12313A">{{pd.v}}</span>
+        </div>
+      </sc-for>
+      <div onClick="{{restart}}" style="padding:14px 18px;font-size:14px;color:#16A0B8;font-weight:700;cursor:pointer">Rifai le prime domande ›</div>
+    </div>
+  </sc-if>
+</div>
+
+<!-- floating tab bar -->
+<div style="position:absolute;left:18px;right:18px;bottom:24px;z-index:30;display:flex;background:rgba(255,255,255,.94);border:1px solid #D7E8EC;border-radius:999px;padding:6px;box-shadow:0 10px 28px rgba(14,90,109,.16);backdrop-filter:blur(14px)">
+  <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+    <div onClick="{{t.go}}" style-active="transform:scale(.95)" style="flex:1;text-align:center;padding:11px 0;border-radius:999px;font-size:13px;font-weight:800;cursor:pointer;background:{{t.bg}};color:{{t.color}};transition:all .15s;position:relative">{{t.label}}<sc-if value="{{t.dot}}" hint-placeholder-val="{{false}}"><span style="position:absolute;top:6px;right:14px;width:7px;height:7px;border-radius:4px;background:#C4553B"></span></sc-if></div>
+  </sc-for>
+</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:960},&quot;scenario&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;tutto-ok&quot;,&quot;acqua-verde&quot;,&quot;errore-rete&quot;],&quot;default&quot;:&quot;tutto-ok&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Stati alternativi&quot;},&quot;salvadanaio&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pieno&quot;,&quot;primo-giorno&quot;],&quot;default&quot;:&quot;pieno&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Stati alternativi&quot;},&quot;skipOnboarding&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Flusso&quot;}}">
+class Component extends DCLogic {
+  state = {
+    phase: 'onboarding', obStep: 0,
+    size: null, pump: null, city: '', cityPick: null, showExact: false, dimL: '', dimW: '', dimD: '', treatment: null,
+    tab: 'oggi', waterAnswer: null, cart: {}, shopView: 'home', prodSel: null, search: '', orderDone: false,
+    logs: [
+      { name: 'Cloro', emoji: '🧴', when: 'ieri, 18:30' },
+      { name: 'pH−', emoji: '⚗️', when: 'domenica' },
+      { name: 'Antialghe', emoji: '🌿', when: '12 giorni fa' },
+    ],
+  };
+  componentDidMount() { if (this.props.skipOnboarding) this.setState({ phase: 'app' }); }
+  componentDidUpdate(prev) {
+    if (this.props.skipOnboarding && !prev.skipOnboarding && this.state.phase !== 'app')
+      this.setState({ phase: 'app', tab: 'oggi' });
+    if (!this.props.skipOnboarding && prev.skipOnboarding)
+      this.setState({ phase: 'onboarding', obStep: 0 });
+  }
+  next() { const s = this.state.obStep; s >= 3 ? this.setState({ phase: 'reveal' }) : this.setState({ obStep: s + 1 }); }
+  pick(key, val) { this.setState({ [key]: val }); setTimeout(() => this.next(), 380); }
+  renderVals() {
+    const st = this.state, P = '#0E5A6D', SEL = '#16A0B8', SELBG = '#EAF6F9', UN = '#D7E8EC';
+    const scenario = this.props.scenario ?? 'tutto-ok';
+    const netError = scenario === 'errore-rete';
+    const urgent = scenario === 'acqua-verde' || st.waterAnswer === 'verdina';
+    const cloudy = !urgent && st.waterAnswer === 'torbida';
+    const score = urgent ? 34 : cloudy ? 58 : 86;
+    const scoreColor = urgent ? '#C4553B' : cloudy ? '#E8A13C' : '#16A0B8';
+    const firstDay = (this.props.salvadanaio ?? 'pieno') === 'primo-giorno';
+    const answered = st.waterAnswer !== null;
+    const cityName = st.cityPick || 'Monza';
+
+    const sizesDef = [
+      { id: 'S', label: 'Piccola', m: 'fino a 4 m · ~10 m³', w: 34, h: 22 },
+      { id: 'M', label: 'Media', m: '4–7 m · ~25 m³', w: 48, h: 30 },
+      { id: 'L', label: 'Grande', m: '7–10 m · ~45 m³', w: 64, h: 38 },
+      { id: 'XL', label: 'Grandissima', m: 'oltre 10 m · 60+ m³', w: 80, h: 46 },
+    ];
+    const selStyle = (on) => ({ bg: on ? SELBG : '#FFFFFF', bc: on ? SEL : UN });
+    const sizes = sizesDef.map(s => ({ ...s, ...selStyle(st.size === s.id), pick: () => this.pick('size', s.id) }));
+    const pumps = ['0.5', '0.75', '1', '1.5', '2'].map(hp => ({ hp, ...selStyle(st.pump === hp), pick: () => this.pick('pump', hp) }));
+    const noSel = selStyle(st.pump === 'boh');
+    const treatments = [
+      { id: 'cloro', label: 'Cloro', sub: 'pastiglie o granulare', emoji: '🧴' },
+      { id: 'sale', label: 'Sale', sub: 'elettrolisi del sale', emoji: '🧂' },
+      { id: 'boh', label: 'Non lo so', sub: 'nessun problema, scopriamolo insieme', emoji: '🤷' },
+    ].map(t => ({ ...t, ...selStyle(st.treatment === t.id), pick: () => this.pick('treatment', t.id) }));
+
+    const cities = ['Monza', 'Milano', 'Modena', 'Mantova', 'Monopoli', 'Bergamo', 'Brescia', 'Bologna', 'Bari', 'Verona', 'Varese', 'Como', 'Cuneo', 'Roma', 'Rimini', 'Torino', 'Treviso', 'Napoli', 'Firenze', 'Padova', 'Lecce', 'Latina'];
+    const q = st.city.trim().toLowerCase();
+    const sugg = (q && !st.cityPick ? cities.filter(c => c.toLowerCase().startsWith(q)).slice(0, 4) : [])
+      .map(name => ({ name, pick: () => { this.setState({ city: name, cityPick: name }); setTimeout(() => this.next(), 380); } }));
+
+    const qOpts = [
+      { id: 'azzurra', emoji: '💙', label: 'Azzurra' },
+      { id: 'torbida', emoji: '😶‍🌫️', label: 'Torbida' },
+      { id: 'verdina', emoji: '🟢', label: 'Verdina' },
+    ].map(o => ({ ...o, pick: () => this.setState({ waterAnswer: o.id }) }));
+
+    const chips = [
+      { name: 'Cloro', emoji: '🧴' }, { name: 'pH+', emoji: '🧪' }, { name: 'pH−', emoji: '⚗️' },
+      { name: 'Antialghe', emoji: '🌿' }, { name: 'Flocculante', emoji: '✨' },
+    ].map(c => ({ ...c, pick: () => this.setState(s => ({ logs: [{ ...c, when: 'adesso' }, ...s.logs].slice(0, 6) })) }));
+
+    const fmt = n => n.toFixed(2).replace('.', ',') + ' €';
+    const PRODS = [
+      { id: 'shock', cat: 'chimici', rating: 4.6, name: 'Shock Cloro Rapido 1 kg', emoji: '⚡', price: 14.9, old: 19.9, badge: 'Green · Made in Italy', desc: 'Cloro a scioglimento rapido: in 24 ore l\u2019acqua verde torna azzurra. Dose: 15 g per m³, la sera, a pompa accesa.' },
+      { id: 'antialghe', cat: 'chimici', rating: 4.4, name: 'Antialghe Concentrato 1 L', emoji: '🌿', price: 11.5, old: null, badge: 'Made in Italy', desc: 'Previene il ritorno delle alghe. Da usare il giorno dopo il trattamento shock, poi una volta a settimana.' },
+      { id: 'cloro5', cat: 'chimici', rating: 4.8, name: 'Cloro Multifunzione 5 kg', emoji: '🧴', price: 34.9, old: 42, badge: 'Green · Made in Italy', desc: 'Pastiglie 4-in-1: disinfetta, previene le alghe, rende l\u2019acqua limpida e stabilizza il pH. Scorta per tutta l\u2019estate.' },
+      { id: 'floc', cat: 'chimici', rating: 4.5, name: 'Flocculante in cartucce', emoji: '✨', price: 12.9, old: 15.9, badge: 'Green · Made in Italy', desc: 'Una cartuccia nello skimmer e l\u2019acqua torbida torna limpida in una notte.' },
+      { id: 'telo', cat: 'coperture', rating: 4.7, name: 'Telo copertura estiva', emoji: '🛡', price: 49, old: 65, badge: 'su misura', desc: 'Tiene l\u2019acqua calda e pulita: meno evaporazione, meno cloro, meno ore di pompa. Si ripaga in un mese.' },
+      { id: 'retino', cat: 'accessori', rating: 4.3, name: 'Retino professionale', emoji: '🥅', price: 12.9, old: 16.9, badge: 'manico telescopico', desc: 'Rete profonda e manico fino a 3 metri: foglie e insetti via in due minuti.' },
+      { id: 'kit', cat: 'accessori', rating: 4.6, name: 'Kit test pH e cloro', emoji: '🧪', price: 9.9, old: null, badge: '80 strisce', desc: 'Immergi, aspetta 15 secondi, confronta i colori. Più semplice di così.' },
+      { id: 'robot', cat: 'robot', rating: 4.5, name: 'Robot pulitore fondo', emoji: '🤖', price: 189, old: 229, badge: 'Green · 2 anni garanzia', desc: 'Pulisce fondo e pareti da solo mentre tu fai altro. Il regalo che la tua schiena ti chiede.' },
+      { id: 'sale25', cat: 'chimici', rating: 4.7, name: 'Sale speciale piscine 25 kg', emoji: '🧂', price: 18.9, old: null, badge: 'purezza 99,9%', desc: 'Sale ad alta purezza per elettrolisi: si scioglie in fretta, senza residui.' },
+      { id: 'doccia', cat: 'accessori', rating: 4.4, name: 'Doccia solare da giardino', emoji: '🚿', price: 119, old: 149, badge: '35 L · Made in Italy', desc: 'Acqua calda gratis, scaldata dal sole. Il tuffo inizia meglio.' },
+      { id: 'pompacalore', cat: 'pompe', rating: 4.5, name: 'EcoHeat Pompa di Calore 12 kW', emoji: '♨️', price: 1250, old: 1490, badge: 'riscalda fino a 60 m³', desc: 'Allunga la stagione: acqua a 28 °C da maggio a settembre, consumando poco.' },
+      { id: 'luciled', cat: 'luci', rating: 4.6, name: 'Faro LED subacqueo RGB', emoji: '💡', price: 39.9, old: 49.9, badge: 'con telecomando', desc: 'Cambia colore alla piscina con un tasto. Montaggio senza attrezzi.' },
+      { id: 'filtro', cat: 'accessori', rating: 4.5, name: 'Cartucce filtro (2 pezzi)', emoji: '🌀', price: 16.9, old: null, badge: 'universali', desc: 'Ricambio per il filtro a cartuccia: una al mese e l\u2019acqua ringrazia.' },
+    ];
+    const pimg = id => 'img/prod-' + id + '.svg';
+    const byId = Object.fromEntries(PRODS.map(p => [p.id, p]));
+    const cart = st.cart, cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
+    const cartTotal = Object.entries(cart).reduce((a, [id, qn]) => a + byId[id].price * qn, 0);
+    const setQty = (id, qn) => this.setState(s => { const c = { ...s.cart }; if (qn <= 0) delete c[id]; else c[id] = qn; return { cart: c, orderDone: false }; });
+    const openProd = (id) => this.setState({ tab: 'shop', shopView: 'prod', prodSel: id });
+    const decorate = (p) => ({
+      ...p, img: 'img/prod-' + p.id + '.svg', priceF: fmt(p.price), oldF: p.old ? fmt(p.old) : '', hasOld: !!p.old,
+      starStr: '★'.repeat(Math.round(p.rating || 4.5)) + '☆'.repeat(5 - Math.round(p.rating || 4.5)),
+      ratingF: (p.rating || 4.5).toFixed(1).replace('.', ',') + '/5',
+      btnS: cart[p.id] ? 'NEL CARRELLO ✓' : 'AGGIUNGI AL CARRELLO', btnSBg: cart[p.id] ? '#EAF6F9' : '#FFFFFF',
+      pct: p.old ? '\u2212' + Math.round((1 - p.price / p.old) * 100) + '%' : '',
+      inCart: !!cart[p.id], qty: cart[p.id] || 0,
+      open: () => openProd(p.id),
+      add: (e) => { if (e && e.stopPropagation) e.stopPropagation(); setQty(p.id, (cart[p.id] || 0) + 1); },
+      inc: () => setQty(p.id, (cart[p.id] || 0) + 1),
+      dec: () => setQty(p.id, (cart[p.id] || 0) - 1),
+      btn: cart[p.id] ? 'Nel carrello ✓ · ' + cart[p.id] : 'Ordina con sconto Poolite',
+      btnBg: cart[p.id] ? '#EAF6F9' : P, btnColor: cart[p.id] ? P : '#FFFFFF',
+    });
+    const needNowIds = urgent ? ['shock', 'antialghe'] : cloudy ? ['floc'] : ['cloro5'];
+    const whyById = { shock: '💡 Hai detto che l\u2019acqua è verdina: serve un trattamento shock, subito.', antialghe: 'Da mettere il giorno dopo lo shock: così il verde non torna.', floc: '💡 Acqua torbida: il flocculante la fa tornare limpida in una notte.', cloro5: '💡 Al ritmo dei tuoi trattamenti, il cloro finisce tra 12 giorni. E oggi è in offerta.' };
+    const needNow = needNowIds.map(id => ({ ...decorate(byId[id]), why: whyById[id], border: urgent ? '#E8C5BC' : UN, whyBg: urgent ? '#FBEDEA' : '#EAF6F9', whyColor: urgent ? '#8A3B29' : P }));
+    const deals = PRODS.filter(p => p.old).map(decorate);
+    const sq = st.search.trim().toLowerCase();
+    const catalogo = PRODS.filter(p => (!sq || p.name.toLowerCase().includes(sq)) && (!st.category || p.cat === st.category)).map(decorate);
+    const CATS = [
+      { id: 'chimici', label: 'Prodotti chimici', im: 'cloro5' },
+      { id: 'robot', label: 'Robot pulitori', im: 'robot' },
+      { id: 'accessori', label: 'Accessori & filtri', im: 'filtro' },
+      { id: 'pompe', label: 'Pompe di calore', im: 'pompacalore' },
+      { id: 'coperture', label: 'Coperture', im: 'telo' },
+      { id: 'luci', label: 'Luci LED', im: 'luciled' },
+    ];
+    const cats = CATS.map(c => ({ ...c, img: pimg(c.im), bc: st.category === c.id ? '#16A0B8' : 'transparent', pick: () => this.setState({ category: st.category === c.id ? null : c.id }) }));
+    const activeCat = CATS.find(c => c.id === st.category);
+    const banners = [
+      { tag: 'OFFERTE ESCLUSIVE', title: 'Risparmia il 20% su robot pulitori e chimica smart', img: pimg('robot'), open: () => openProd('robot') },
+      { tag: 'SOLO CON POOLITE', title: 'Coperture su misura: \u221225% e l\u2019acqua resta calda', img: pimg('telo'), open: () => openProd('telo') },
+      { tag: 'CONSEGNA GRATIS', title: 'Spedizione gratuita sopra i 39 €, sempre', img: pimg('cloro5'), open: () => openProd('cloro5') },
+    ];
+    const prod = st.prodSel ? decorate(byId[st.prodSel]) : null;
+    const cartItems = Object.entries(cart).map(([id, qn]) => ({ ...decorate(byId[id]), qty: qn, lineF: fmt(byId[id].price * qn) }));
+
+    const tabsDef = [
+      { id: 'oggi', label: 'Oggi' }, { id: 'domani', label: 'Domani' }, { id: 'acqua', label: 'Acqua' },
+      { id: 'shop', label: 'Shop', dot: urgent }, { id: 'tu', label: 'Tu' },
+    ];
+    const tabs = tabsDef.map(t => ({
+      ...t, dot: !!t.dot && st.tab !== t.id,
+      bg: st.tab === t.id ? P : 'transparent', color: st.tab === t.id ? '#FFFFFF' : '#4E6B74',
+      go: () => this.setState(t.id === 'shop' ? { tab: 'shop', shopView: 'home' } : { tab: t.id }),
+    }));
+
+    const sizeLabel = { S: 'Piccola (~10 m³)', M: 'Media (~25 m³)', L: 'Grande (~45 m³)', XL: 'Grandissima (60+ m³)', custom: `${st.dimL || '?'} × ${st.dimW || '?'} × ${st.dimD || '?'} m` }[st.size] || 'Media (~25 m³)';
+    const gocce = (firstDay ? 50 : 320) + (answered ? 10 : 0);
+
+    return {
+      wave: [0.9, 0.3, 0.65, 0.3, 0.9, 0.3, 0.65, 0.3, 0.9],
+      isOb: st.phase === 'onboarding', isReveal: st.phase === 'reveal', isLoading: st.phase === 'loading', isApp: st.phase === 'app',
+      obIs0: st.obStep === 0, obIs1: st.obStep === 1, obIs2: st.obStep === 2, obIs3: st.obStep === 3,
+      canBack: st.obStep > 0, obBack: () => this.setState({ obStep: st.obStep - 1 }),
+      dots: [0, 1, 2, 3].map(i => ({ bg: i <= st.obStep ? P : UN })),
+      sizes, pumps, treatments, sugg, hasSugg: sugg.length > 0,
+      noPumpBg: noSel.bg, noPumpBc: noSel.bc, pickNoPump: () => this.pick('pump', 'boh'),
+      showExact: st.showExact, hideExact: !st.showExact, toggleExact: () => this.setState({ showExact: true }),
+      dimL: st.dimL, dimW: st.dimW, dimD: st.dimD,
+      setDimL: e => this.setState({ dimL: e.target.value }), setDimW: e => this.setState({ dimW: e.target.value }), setDimD: e => this.setState({ dimD: e.target.value }),
+      useExact: () => this.pick('size', 'custom'),
+      city: st.city, setCity: e => this.setState({ city: e.target.value, cityPick: null }),
+      revealCost: '2,80 €',
+      goApp: () => { this.setState({ phase: 'loading' }); setTimeout(() => this.setState({ phase: 'app' }), 1500); },
+      retry: () => {},
+      tabOggi: st.tab === 'oggi', tabDomani: st.tab === 'domani', tabAcqua: st.tab === 'acqua', tabShop: st.tab === 'shop', tabTu: st.tab === 'tu',
+      tabs, cityName, netError, netOk: !netError,
+      score, scoreColor,
+      gaugeBg: `conic-gradient(${scoreColor} ${score * 3.6}deg, #D7E8EC ${score * 3.6}deg)`,
+      scoreLabel: urgent ? 'Serve una mano, oggi' : cloudy ? 'Acqua un po\u2019 stanca' : 'Acqua in gran forma 💙',
+      scoreHint: urgent ? 'Niente panico: nello Shop trovi le due cose che servono, nell\u2019ordine giusto.' : cloudy ? 'Con un flocculante stanotte torna limpida.' : 'Continua così: il diario mi aiuta a tenerla perfetta.',
+      qOpen: !answered, qDone: answered, qOpts, chips, logs: st.logs,
+      allOk: !urgent && !cloudy, shopUrgent: urgent, needNow, catalogo, deals,
+      shopHome: st.shopView === 'home', shopProd: st.shopView === 'prod' && !!prod, shopCart: st.shopView === 'cart',
+      prod, cartItems, cartCount, cartBadge: cartCount > 0, cartEmptyMsg: cartCount === 0 && !st.orderDone,
+      hasItems: cartCount > 0, cartTotalF: fmt(cartTotal), orderDone: st.orderDone,
+      search: st.search, setSearch: e => this.setState({ search: e.target.value }),
+      cats, banners, catTitle: activeCat ? activeCat.label : 'Dal catalogo Rio',
+      catActive: !!activeCat, clearCat: () => this.setState({ category: null }),
+      openCart: () => this.setState({ tab: 'shop', shopView: 'cart' }),
+      shopBack: () => this.setState({ shopView: 'home' }),
+      checkout: () => this.setState({ cart: {}, orderDone: true }),
+      goShop: () => this.setState({ tab: 'shop', shopView: 'home' }),
+      dealTelo: decorate(byId.telo),
+      dealAcqua: decorate(byId[urgent ? 'shock' : cloudy ? 'floc' : 'robot']),
+      dealAcquaWhy: urgent ? 'Serve adesso, e oggi costa meno:' : cloudy ? 'Per l\u2019acqua torbida, in offerta oggi:' : 'In offerta per la tua piscina:',
+      dealsCount: deals.length,
+      gocce, streak: firstDay ? 1 : 12, knowPct: answered ? 65 : 62,
+      piggyAmount: firstDay ? '0,00 €' : '47,60 €',
+      piggySub: firstDay ? 'Il salvadanaio parte oggi 🌱 Da domani vedrai qui gli euro che ti faccio risparmiare.' : 'risparmiati in 28 giorni, senza fare niente',
+      poolData: [
+        { k: 'Dimensione', v: sizeLabel },
+        { k: 'Pompa', v: st.pump === 'boh' || !st.pump ? '1 HP (stimata)' : st.pump + ' HP' },
+        { k: 'Città', v: cityName },
+        { k: 'Trattamento', v: { cloro: 'Cloro', sale: 'Sale', boh: 'Da scoprire' }[st.treatment] || 'Cloro' },
+      ],
+      goAcqua: () => this.setState({ tab: 'acqua' }),
+      restart: () => this.setState({ phase: 'onboarding', obStep: 0, size: null, pump: null, city: '', cityPick: null, treatment: null, showExact: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>

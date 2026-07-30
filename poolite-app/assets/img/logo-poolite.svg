@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200"><defs>
+<linearGradient id="gf" x1="0" y1="1" x2="1" y2="0">
+<stop offset="0" stop-color="#0E5A6D"></stop><stop offset="0.55" stop-color="#16A0B8"></stop><stop offset="1" stop-color="#5FC3D4"></stop>
+</linearGradient>
+<linearGradient id="gd" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#8FD9E4"></stop><stop offset="1" stop-color="#16A0B8"></stop>
+</linearGradient>
+</defs>
+<g transform="translate(6,4) scale(0.96)"><g>
+<path d="M168 34 C118 38 74 78 58 128 C55 138 52 150 48 168 C68 152 86 146 102 134 C142 104 162 68 168 34 Z" fill="url(#gf)"></path>
+<path d="M48 168 C80 120 128 70 168 34" fill="none" stroke="#F2F8FA" stroke-width="4" stroke-linecap="round"></path>
+<path d="M96 96 L118 96 M82 114 L104 116 M70 132 L90 136" stroke="#F2F8FA" stroke-width="3" stroke-linecap="round" opacity="0.75"></path>
+<path d="M36 186 C40 178 44 172 48 168" fill="none" stroke="#0E5A6D" stroke-width="5" stroke-linecap="round"></path>
+<path d="M150 22 l3 6 6 3 -6 3 -3 6 -3 -6 -6 -3 6 -3 Z" fill="#E8A13C"></path>
+</g></g>
+<text x="178" y="140" font-family="-apple-system,&#39;SF Pro Display&#39;,&#39;Segoe UI&#39;,system-ui,sans-serif" font-size="104" font-weight="800" letter-spacing="-3" fill="#0E5A6D">poolite</text>
+<g><g transform="scale(1.1)"><path d="M0 -13 C5 -5 8.5 1 8.5 6 A8.5 8.5 0 1 1 -8.5 6 C-8.5 1 -5 -5 0 -13 Z" fill="url(#gd)" stroke="#0E5A6D" stroke-width="1.5"></path><circle cx="-3" cy="4" r="2.4" fill="#FFFFFF" opacity="0.8"></circle></g></g>
+</svg>
