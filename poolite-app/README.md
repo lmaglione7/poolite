@@ -14,9 +14,17 @@ Scan the QR with Expo Go, or press `i`/`a` for a simulator. The app works
 fully in **demo mode** with no setup: onboarding, weather (live, via
 Open-Meteo), and the Shop catalog all work locally on-device.
 
-> **Expo SDK 54** — pinned on purpose. Expo Go from the App Store supports one
-> SDK at a time, so the project must match it or the phone shows *"Project is
-> incompatible with this version of Expo Go"*. See `AGENTS.md` before bumping.
+> **Expo 54.0.2 — versione bloccata di proposito.** Expo Go supporta un solo
+> SDK alla volta e ha i moduli nativi compilati dentro: il progetto deve
+> combaciare con la build installata sul telefono (54.0.2), altrimenti compare
+> *"Project is incompatible with this version of Expo Go"* o si ottengono
+> errori nativi. Leggi `AGENTS.md` prima di alzare la versione.
+>
+> Se aggiorni da una versione precedente, **cancella prima le dipendenze
+> vecchie**, altrimenti npm tiene quelle dell'SDK sbagliato:
+> ```sh
+> rm -rf node_modules package-lock.json && npm install
+> ```
 
 To turn on real accounts, a real Postgres-backed marketplace, and real
 Stripe payments, follow **`supabase/README.md`** and fill in `.env` (copy

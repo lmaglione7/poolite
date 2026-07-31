@@ -1,7 +1,12 @@
-# Expo SDK 54
+# Expo SDK 54 — versione bloccata a 54.0.2
 
-Questo progetto è fissato a **Expo SDK 54** perché deve girare sull'app
-**Expo Go** pubblicata sull'App Store, che supporta solo un SDK per volta.
+Il progetto è fissato a **`expo` 54.0.2 esatta** (non un range) per combaciare
+con la build di **Expo Go 54.0.2** installata sul telefono di sviluppo.
+
+Expo Go ha i moduli nativi compilati al suo interno: le versioni JS dei
+pacchetti `expo-*` devono corrispondere a quelle native, altrimenti si
+ottengono errori a runtime difficili da diagnosticare. Le versioni qui
+elencate vengono da `bundledNativeModules.json` di `expo@54.0.2`.
 
 Prima di scrivere codice, consulta la documentazione della versione esatta:
 https://docs.expo.dev/versions/v54.0.0/
