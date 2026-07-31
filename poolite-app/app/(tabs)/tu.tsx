@@ -9,6 +9,8 @@ import { usePoolProfile } from '../../src/state/PoolProfileContext';
 import { useAuth } from '../../src/state/AuthContext';
 import { useSubscriptions } from '../../src/state/SubscriptionsContext';
 import { useRewards, REFERRAL_REWARD } from '../../src/state/RewardsContext';
+import { useOrders } from '../../src/state/OrdersContext';
+import { useWishlist } from '../../src/state/WishlistContext';
 import { useCatalog } from '../../src/hooks/useCatalog';
 import { useWeatherCost } from '../../src/hooks/useWeatherCost';
 import { useWaterState } from '../../src/hooks/useWaterState';
@@ -38,6 +40,8 @@ export default function TuTab() {
   const auth = useAuth();
   const subs = useSubscriptions();
   const rewards = useRewards();
+  const orders = useOrders();
+  const wishlist = useWishlist();
   const { products, byId } = useCatalog();
   const { today, cityName } = useWeatherCost();
   const { score } = useWaterState();
@@ -131,6 +135,24 @@ export default function TuTab() {
         </Card>
       </View>
 
+      <View style={styles.quickRow}>
+        {[
+          { icon: '📦', label: 'I miei ordini', href: '/ordini', badge: orders.orders.length || undefined },
+          { icon: '🤍', label: 'Preferiti', href: '/preferiti', badge: wishlist.count || undefined },
+          { icon: '📍', label: 'Indirizzi', href: '/indirizzi', badge: undefined },
+        ].map((q) => (
+          <PressableScale key={q.href} scaleTo={0.96} onPress={() => router.push(q.href as any)} style={styles.quickCard}>
+            <Text style={{ fontSize: 22 }}>{q.icon}</Text>
+            <Text style={styles.quickLabel}>{q.label}</Text>
+            {q.badge ? (
+              <View style={styles.quickBadge}>
+                <Text style={styles.quickBadgeText}>{q.badge}</Text>
+              </View>
+            ) : null}
+          </PressableScale>
+        ))}
+      </View>
+
       <PressableScale scaleTo={0.98} onPress={() => router.push('/premi')}>
         <Card tone="amber" style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 12 }}>
           <Text style={{ fontSize: 26 }}>🎁</Text>
@@ -211,6 +233,11 @@ const styles = StyleSheet.create({
   meta: { fontSize: 13, color: colors.textSecondary, fontWeight: '600' },
   settingsBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   settingsIcon: { fontSize: 17 },
+  quickRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  quickCard: { flex: 1, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 18, paddingVertical: 14, alignItems: 'center', gap: 5 },
+  quickLabel: { fontSize: 12, fontWeight: '700', color: colors.textPrimary, textAlign: 'center' },
+  quickBadge: { position: 'absolute', top: 8, right: 10, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  quickBadgeText: { color: '#FFFFFF', fontSize: 10, fontWeight: '800' },
   piggyLabel: { fontSize: 13, color: colors.textSecondary, fontWeight: '700' },
   piggyAmount: { fontSize: 54, fontWeight: '800', color: colors.amber, letterSpacing: -2, marginVertical: 4 },
   piggySub: { fontSize: 14, color: colors.textSecondary, textAlign: 'center' },

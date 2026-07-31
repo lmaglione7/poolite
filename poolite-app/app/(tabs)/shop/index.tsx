@@ -14,8 +14,9 @@ import { PressableScale } from '../../../src/components/PressableScale';
 import { colors } from '../../../src/theme/colors';
 import { useCatalog } from '../../../src/hooks/useCatalog';
 import { useWaterState } from '../../../src/hooks/useWaterState';
-import { CATEGORIES, ProductCategory, starString } from '../../../src/data/products';
+import { CATEGORIES, ProductCategory, starString, isOutOfStock } from '../../../src/data/products';
 import { TECHNICIANS } from '../../../src/data/technicians';
+import { useWishlist } from '../../../src/state/WishlistContext';
 import { router } from 'expo-router';
 
 const WHY_BY_ID: Record<string, string> = {
@@ -24,22 +25,77 @@ const WHY_BY_ID: Record<string, string> = {
   cloro5: '💡 Al ritmo dei tuoi trattamenti, il cloro finisce tra 12 giorni. E oggi è in offerta.',
 };
 
+type SortKey = 'rilevanza' | 'prezzo-asc' | 'prezzo-desc' | 'rating' | 'venduti';
+
+const SORTS: { id: SortKey; label: string }[] = [
+  { id: 'rilevanza', label: 'Rilevanza' },
+  { id: 'venduti', label: 'Più venduti' },
+  { id: 'prezzo-asc', label: 'Prezzo ↑' },
+  { id: 'prezzo-desc', label: 'Prezzo ↓' },
+  { id: 'rating', label: 'Recensioni' },
+];
+
+/** Forgiving match: ignores accents and case, so "antialghe" finds "Antialghe". */
+function normalize(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+}
+
 export default function ShopHome() {
   const { products, loading } = useCatalog();
   const { urgent, cloudy, allOk } = useWaterState();
+  const wishlist = useWishlist();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<ProductCategory | null>(null);
+  const [sort, setSort] = useState<SortKey>('rilevanza');
+  const [onlyDeals, setOnlyDeals] = useState(false);
+  const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const needNowIds = urgent ? ['shock', 'antialghe'] : cloudy ? ['floc'] : ['cloro5'];
   const needNow = needNowIds.map((id) => products.find((p) => p.id === id)).filter(Boolean) as typeof products;
   const deals = products.filter((p) => p.old);
 
   const catalogo = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return products.filter((p) => (!q || p.name.toLowerCase().includes(q)) && (!category || p.cat === category));
-  }, [products, search, category]);
+    const q = normalize(search.trim());
+    const list = products.filter((p) => {
+      if (q && !normalize(p.name).includes(q) && !normalize(p.badge).includes(q) && !normalize(p.desc).includes(q)) return false;
+      if (category && p.cat !== category) return false;
+      if (onlyDeals && !p.old) return false;
+      if (onlyAvailable && isOutOfStock(p)) return false;
+      return true;
+    });
+    const sorted = [...list];
+    switch (sort) {
+      case 'prezzo-asc':
+        sorted.sort((a, b) => a.price - b.price);
+        break;
+      case 'prezzo-desc':
+        sorted.sort((a, b) => b.price - a.price);
+        break;
+      case 'rating':
+        sorted.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'venduti':
+        sorted.sort((a, b) => (b.sold ?? 0) - (a.sold ?? 0));
+        break;
+      default:
+        // Relevance: available first, then discounted, then best sellers.
+        sorted.sort((a, b) => {
+          const avail = Number(isOutOfStock(a)) - Number(isOutOfStock(b));
+          if (avail !== 0) return avail;
+          const deal = Number(!!b.old) - Number(!!a.old);
+          if (deal !== 0) return deal;
+          return (b.sold ?? 0) - (a.sold ?? 0);
+        });
+    }
+    return sorted;
+  }, [products, search, category, sort, onlyDeals, onlyAvailable]);
 
   const activeCategory = CATEGORIES.find((c) => c.id === category);
+  const filtersActive = onlyDeals || onlyAvailable || sort !== 'rilevanza';
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
@@ -57,8 +113,22 @@ export default function ShopHome() {
               placeholder="Cerca nel catalogo Rio…"
               placeholderTextColor={colors.textSecondary}
               style={styles.searchInput}
+              returnKeyType="search"
             />
+            {search.length > 0 && (
+              <PressableScale haptic={false} onPress={() => setSearch('')}>
+                <Text style={styles.clearSearch}>✕</Text>
+              </PressableScale>
+            )}
           </View>
+          <PressableScale scaleTo={0.93} onPress={() => router.push('/preferiti')} style={styles.iconBtn}>
+            <Text style={{ fontSize: 17 }}>{wishlist.count > 0 ? '❤️' : '🤍'}</Text>
+            {wishlist.count > 0 && (
+              <View style={styles.iconBadge}>
+                <Text style={styles.iconBadgeText}>{wishlist.count}</Text>
+              </View>
+            )}
+          </PressableScale>
           <CartButton />
         </View>
 
@@ -130,12 +200,57 @@ export default function ShopHome() {
 
         <View style={styles.catalogHeader}>
           <Text style={styles.sectionTitle}>{activeCategory ? activeCategory.label : 'Dal catalogo Rio'}</Text>
-          {activeCategory && (
-            <Text onPress={() => setCategory(null)} style={styles.clearCat}>
-              ✕ mostra tutto
+          <PressableScale haptic={false} onPress={() => setShowFilters((v) => !v)}>
+            <Text style={[styles.filterToggle, filtersActive && { color: colors.amber }]}>
+              ⚙ Filtri{filtersActive ? ' •' : ''}
             </Text>
-          )}
+          </PressableScale>
         </View>
+
+        {showFilters && (
+          <Card soft style={{ marginTop: 10 }}>
+            <Text style={styles.filterGroupLabel}>ORDINA PER</Text>
+            <View style={styles.chipWrap}>
+              {SORTS.map((s) => (
+                <PressableScale
+                  key={s.id}
+                  haptic={false}
+                  onPress={() => setSort(s.id)}
+                  style={[styles.chip, sort === s.id && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                >
+                  <Text style={[styles.chipText, sort === s.id && { color: '#FFFFFF' }]}>{s.label}</Text>
+                </PressableScale>
+              ))}
+            </View>
+            <Text style={[styles.filterGroupLabel, { marginTop: 14 }]}>MOSTRA SOLO</Text>
+            <View style={styles.chipWrap}>
+              <PressableScale
+                haptic={false}
+                onPress={() => setOnlyDeals((v) => !v)}
+                style={[styles.chip, onlyDeals && { backgroundColor: colors.amberBg, borderColor: colors.amber }]}
+              >
+                <Text style={[styles.chipText, onlyDeals && { color: colors.amber }]}>🏷 In offerta</Text>
+              </PressableScale>
+              <PressableScale
+                haptic={false}
+                onPress={() => setOnlyAvailable((v) => !v)}
+                style={[styles.chip, onlyAvailable && { backgroundColor: colors.selectedBg, borderColor: colors.accent }]}
+              >
+                <Text style={[styles.chipText, onlyAvailable && { color: colors.primary }]}>✓ Disponibili</Text>
+              </PressableScale>
+              {activeCategory && (
+                <PressableScale haptic={false} onPress={() => setCategory(null)} style={styles.chip}>
+                  <Text style={[styles.chipText, { color: colors.error }]}>✕ {activeCategory.label}</Text>
+                </PressableScale>
+              )}
+            </View>
+          </Card>
+        )}
+
+        <Text style={styles.resultCount}>
+          {catalogo.length} {catalogo.length === 1 ? 'prodotto' : 'prodotti'}
+          {search ? ` per “${search}”` : ''}
+        </Text>
         <View style={styles.catalogGrid}>
           {catalogo.map((p) => (
             <View key={p.id} style={{ width: '48%' }}>
@@ -155,6 +270,16 @@ const styles = StyleSheet.create({
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   searchBox: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 999, paddingHorizontal: 16, height: 42 },
   searchInput: { flex: 1, fontSize: 15, color: colors.textPrimary },
+  clearSearch: { fontSize: 14, color: colors.textSecondary, paddingHorizontal: 4 },
+  iconBtn: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  iconBadge: { position: 'absolute', top: -5, right: -5, minWidth: 19, height: 19, borderRadius: 10, backgroundColor: colors.error, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
+  iconBadgeText: { color: '#FFFFFF', fontSize: 11, fontWeight: '800' },
+  filterToggle: { fontSize: 13, fontWeight: '800', color: colors.accent },
+  filterGroupLabel: { fontSize: 10, fontWeight: '800', color: colors.textSecondary, letterSpacing: 0.8 },
+  chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  chip: { borderWidth: 1.5, borderColor: colors.border, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7, backgroundColor: colors.card },
+  chipText: { fontSize: 12, fontWeight: '700', color: colors.textSecondary },
+  resultCount: { fontSize: 12, color: colors.textSecondary, marginTop: 10, paddingHorizontal: 4 },
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginVertical: 6 },
   sectionTitle: { fontWeight: '800', fontSize: 16, color: colors.textPrimary, paddingHorizontal: 4 },
   allOkText: { fontWeight: '800', fontSize: 15, color: colors.primary },

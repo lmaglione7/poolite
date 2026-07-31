@@ -42,8 +42,8 @@ export default function TerminiScreen() {
         {
           heading: 'Pagamenti',
           body: [
-            'Accettiamo carte di credito e debito, Apple Pay, Google Pay, PayPal, Satispay e Klarna. I pagamenti con carta sono gestiti da Stripe: Poolite non memorizza mai i dati completi della tua carta.',
-            'Con Klarna puoi pagare in 3 rate senza interessi: il rapporto di finanziamento è tra te e Klarna, secondo i termini che accetti al momento del pagamento. Klarna effettua le proprie verifiche e può rifiutare la richiesta.',
+            'Accettiamo carte di credito e debito (Visa, Mastercard, American Express), Apple Pay e Google Pay. Tutti i pagamenti sono gestiti da Stripe: Poolite non memorizza mai i dati completi della tua carta, che viaggiano cifrati direttamente verso il processore.',
+            'L’addebito avviene al momento della conferma dell’ordine. In caso di annullamento o reso, il rimborso viene effettuato sullo stesso metodo di pagamento usato per l’acquisto.',
           ],
         },
         {

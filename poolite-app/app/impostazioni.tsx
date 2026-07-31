@@ -9,6 +9,7 @@ import { useSettings, LANGUAGES, COUNTRY, CURRENCY, LanguageCode } from '../src/
 import { useAuth } from '../src/state/AuthContext';
 import { usePoolProfile } from '../src/state/PoolProfileContext';
 import { PAYMENT_METHODS, CARRIERS } from '../src/data/commerce';
+import { PaymentMark, PaymentMarks } from '../src/components/shop/PaymentMarks';
 
 function ToggleRow({
   label,
@@ -147,11 +148,16 @@ export default function ImpostazioniScreen() {
         <Card soft style={styles.cardReset}>
           {PAYMENT_METHODS.map((p, i) => (
             <View key={p.id} style={[styles.row, i === PAYMENT_METHODS.length - 1 && { borderBottomWidth: 0 }]}>
-              <Text style={[styles.rowLabel, { flex: 1 }]}>
-                {p.icon} {p.label}
-              </Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.rowLabel}>{p.label}</Text>
+                <Text style={styles.rowSub}>{p.hint}</Text>
+              </View>
+              <PaymentMark logoKey={p.logoKey} label={p.label} height={20} />
             </View>
           ))}
+          <View style={{ padding: 16, paddingTop: 4 }}>
+            <PaymentMarks showLabel={false} />
+          </View>
         </Card>
 
         <Text style={styles.sectionTitle}>Spedizioni</Text>
@@ -175,6 +181,9 @@ export default function ImpostazioniScreen() {
 
         <Text style={styles.sectionTitle}>Account</Text>
         <Card soft style={styles.cardReset}>
+          <LinkRow label="I miei ordini" onPress={() => router.push('/ordini')} />
+          <LinkRow label="Indirizzi di spedizione" onPress={() => router.push('/indirizzi')} />
+          <LinkRow label="Preferiti" onPress={() => router.push('/preferiti')} />
           <LinkRow label="Email" value={auth.user?.email ?? 'Modalità demo'} />
           <LinkRow
             label="Rifai le prime domande"

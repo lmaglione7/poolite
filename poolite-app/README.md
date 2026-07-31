@@ -98,15 +98,16 @@ and Cold Start network-effect thinking:
   proprio link. Il coupon migliore si applica da solo al carrello; l'importo
   viene **rivalidato lato server** nella edge function (mai fidarsi del client).
 - **Spedizioni e pagamenti** (`src/data/commerce.ts`): DHL, UPS, BRT, Poste
-  Italiane; carta, Apple/Google Pay, PayPal, Klarna (3 rate), Satispay.
-  Gratis sopra 39 €, **express gratis sopra 99 €**, con barra di avanzamento
-  nel carrello. I nomi sono badge testuali: i loghi ufficiali si inseriscono
-  con i media kit dei partner quando gli accordi sono firmati.
+  Italiane; carta, Apple Pay e Google Pay — tutto via Stripe (vedi
+  "Pagamenti" più sotto). Gratis sopra 39 €, **express gratis sopra 99 €**,
+  con barra di avanzamento nel carrello. I nomi dei corrieri sono badge
+  testuali: i loghi ufficiali si inseriscono con i media kit dei partner
+  quando gli accordi sono firmati.
 - **Impostazioni** (`app/impostazioni.tsx`): lingua (italiano attivo, altre
   4 predisposte), paese Italia, valuta EUR, controllo granulare delle
   notifiche, consensi privacy (analytics e marketing **off di default**).
 - **Termini e Privacy** (`app/legale/`): bozze complete e ragionate su GDPR e
-  Codice del Consumo (recesso 30 giorni, garanzia 24 mesi, Klarna, tecnici
+  Codice del Consumo (recesso 30 giorni, garanzia 24 mesi, tecnici
   terzi, recensioni verificate). **Da far revisionare a un legale** e completare
   con i dati societari tra `[parentesi quadre]` prima della pubblicazione.
 
@@ -123,3 +124,44 @@ npx expo run:ios   # needs Xcode; set your Apple team in app.json if prompted
 ```
 
 The bridge no-ops safely everywhere the native module is absent.
+
+## Customer journey (stile marketplace)
+
+Il ciclo commerciale completo, dalla vetrina alla consegna:
+
+1. **Scoperta** — ricerca con match tollerante ad accenti/maiuscole su nome,
+   badge e descrizione; filtri (categoria, solo offerte, solo disponibili) e
+   ordinamento (rilevanza, più venduti, prezzo, recensioni); contatore risultati.
+2. **Prodotto** — foto reale o illustrazione, cuore preferiti, "N venduti",
+   disponibilità onesta (`🔥 Ultimi N pezzi`, `Esaurito` con CTA disabilitata),
+   recensioni contestuali, manuale passo-passo, scorta automatica.
+3. **Carrello** — barra di avanzamento verso spedizione gratis/express,
+   coupon migliore applicato in automatico, poi "Procedi all'ordine".
+4. **Checkout** (`shop/checkout`) — indirizzo selezionabile, velocità di
+   spedizione con costo calcolato, metodo di pagamento, riepilogo e totale.
+   Tutto su una schermata, come i marketplace: niente wizard a step ciechi.
+5. **Conferma** — numero ordine, data di consegna prevista, link al tracking.
+6. **Post-vendita** (`ordini/`) — lista con filtri per stato, dettaglio con
+   **timeline di tracking** (confermato → in preparazione → spedito →
+   consegnato), riepilogo costi, indirizzo, "Ordina di nuovo" e assistenza.
+
+### Indirizzi (`app/indirizzi/`)
+Rubrica con etichette (Casa/Ufficio/Altro), validazione **CAP a 5 cifre**,
+**sigla provincia** verificata sull'elenco reale, telefono, note per il
+corriere e indirizzo predefinito. L'indirizzo viene **fotografato
+sull'ordine** (`orders.shipping_address` jsonb): modificarlo in rubrica non
+riscrive la storia delle spedizioni passate.
+
+### Giacenze
+`products.stock` guida i badge in UI e viene **decrementato lato server** con
+la funzione atomica `reserve_stock()` prima di creare il PaymentIntent: se le
+scorte non bastano l'ordine viene annullato e il cliente non paga.
+
+### Pagamenti
+Tutto passa da **Stripe**: carta (Visa/Mastercard/Amex), **Apple Pay** e
+**Google Pay** come wallet Stripe. Un solo processore = una sola
+riconciliazione e un solo flusso di rimborso.
+I loghi ufficiali si aggiungono lasciando i file in `assets/img/pay/`
+(vedi il README lì) e togliendo il commento alla riga corrispondente in
+`src/data/paymentLogos.ts`: l'app passa da badge testuale a marchio reale
+ovunque, senza altre modifiche.

@@ -9,6 +9,9 @@ import { CartProvider } from '../src/state/CartContext';
 import { SubscriptionsProvider } from '../src/state/SubscriptionsContext';
 import { RewardsProvider } from '../src/state/RewardsContext';
 import { SettingsProvider } from '../src/state/SettingsContext';
+import { AddressProvider } from '../src/state/AddressContext';
+import { OrdersProvider } from '../src/state/OrdersContext';
+import { WishlistProvider } from '../src/state/WishlistContext';
 import { DevStateProvider } from '../src/state/DevStateContext';
 import { AppStripeProvider } from '../src/components/AppStripeProvider';
 import { MilestoneOverlay } from '../src/components/MilestoneOverlay';
@@ -19,15 +22,21 @@ function Providers({ children }: { children: React.ReactNode }) {
     <AuthProvider>
       <SettingsProvider>
         <PoolProfileProvider>
-          <CartProvider>
-            <SubscriptionsProvider>
-              <RewardsProvider>
-                <DevStateProvider>
-                  <AppStripeProvider>{children}</AppStripeProvider>
-                </DevStateProvider>
-              </RewardsProvider>
-            </SubscriptionsProvider>
-          </CartProvider>
+          <AddressProvider>
+            <OrdersProvider>
+              <CartProvider>
+                <WishlistProvider>
+                  <SubscriptionsProvider>
+                    <RewardsProvider>
+                      <DevStateProvider>
+                        <AppStripeProvider>{children}</AppStripeProvider>
+                      </DevStateProvider>
+                    </RewardsProvider>
+                  </SubscriptionsProvider>
+                </WishlistProvider>
+              </CartProvider>
+            </OrdersProvider>
+          </AddressProvider>
         </PoolProfileProvider>
       </SettingsProvider>
     </AuthProvider>
@@ -55,6 +64,13 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="report" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="manuale/[id]" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="indirizzi/index" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="indirizzi/[id]" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="indirizzi/nuovo" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="ordini/index" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="ordini/[id]" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="ordine-confermato" options={{ animation: 'fade', gestureEnabled: false }} />
+            <Stack.Screen name="preferiti" options={{ animation: 'slide_from_right' }} />
             <Stack.Screen name="impostazioni" options={{ animation: 'slide_from_right' }} />
             <Stack.Screen name="premi" options={{ animation: 'slide_from_right' }} />
             <Stack.Screen name="legale/termini" options={{ animation: 'slide_from_right' }} />

@@ -5,12 +5,13 @@ import { PressableScale } from '../../../src/components/PressableScale';
 import { ProductImage } from '../../../src/components/ProductImage';
 import { CartButton } from '../../../src/components/shop/CartButton';
 import { TrustRow } from '../../../src/components/shop/TrustRow';
+import { WishlistButton } from '../../../src/components/shop/WishlistButton';
 import { Card } from '../../../src/components/Card';
 import { colors } from '../../../src/theme/colors';
 import { useCatalog } from '../../../src/hooks/useCatalog';
 import { useCart } from '../../../src/state/CartContext';
 import { useSubscriptions, SUBSCRIPTION_DISCOUNT } from '../../../src/state/SubscriptionsContext';
-import { formatEuro, pctOff, starString } from '../../../src/data/products';
+import { formatEuro, pctOff, starString, isOutOfStock, isLowStock } from '../../../src/data/products';
 import { reviewsForProduct } from '../../../src/data/reviews';
 import { scheduleSubscriptionReminder } from '../../../src/lib/notifications';
 
@@ -30,6 +31,8 @@ export default function ProductDetail() {
   }
 
   const inCart = !!cart.cart[product.id];
+  const soldOut = isOutOfStock(product);
+  const lowStock = isLowStock(product);
   const subscribed = subs.isSubscribed(product.id);
   const suggestedWeeks = subs.suggestedWeeks(product.id);
   const reviews = reviewsForProduct(product.id);
@@ -53,7 +56,10 @@ export default function ProductDetail() {
           <PressableScale scaleTo={0.93} onPress={() => router.back()} style={styles.backBtn}>
             <Text style={styles.backChevron}>‹</Text>
           </PressableScale>
-          <CartButton />
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <WishlistButton productId={product.id} size={42} />
+            <CartButton />
+          </View>
         </View>
 
         <View style={styles.heroWrap}>
@@ -73,8 +79,20 @@ export default function ProductDetail() {
             </View>
             <Text style={styles.ratingText}>
               <Text style={{ color: colors.accent }}>{starString(product.rating)}</Text> {product.rating.toFixed(1).replace('.', ',')}/5
+              {product.sold ? ` · ${product.sold} venduti` : ''}
             </Text>
           </View>
+
+          {soldOut ? (
+            <View style={styles.stockBoxOut}>
+              <Text style={styles.stockOutText}>😔 Esaurito — stiamo rifornendo. Aggiungilo ai preferiti e ti avviso appena torna.</Text>
+            </View>
+          ) : lowStock ? (
+            <View style={styles.stockBoxLow}>
+              <Text style={styles.stockLowText}>🔥 Ultimi {product.stock} pezzi disponibili</Text>
+            </View>
+          ) : null}
+
           <Text style={styles.desc}>{product.desc}</Text>
 
           <View style={styles.priceRow}>
@@ -88,11 +106,16 @@ export default function ProductDetail() {
           </View>
 
           <PressableScale
-            onPress={() => cart.add(product.id)}
-            style={[styles.addBtn, { backgroundColor: inCart ? colors.selectedBg : colors.primary }]}
+            onPress={() => !soldOut && cart.add(product.id)}
+            disabled={soldOut}
+            style={[
+              styles.addBtn,
+              { backgroundColor: inCart ? colors.selectedBg : colors.primary },
+              soldOut && { backgroundColor: colors.border },
+            ]}
           >
-            <Text style={[styles.addBtnText, { color: inCart ? colors.primary : '#FFFFFF' }]}>
-              {inCart ? `Nel carrello ✓ · ${cart.cart[product.id]}` : 'Ordina con sconto Poolite'}
+            <Text style={[styles.addBtnText, { color: inCart && !soldOut ? colors.primary : '#FFFFFF' }]}>
+              {soldOut ? 'Esaurito' : inCart ? `Nel carrello ✓ · ${cart.cart[product.id]}` : 'Ordina con sconto Poolite'}
             </Text>
           </PressableScale>
           <View style={styles.nextDayBadge}>
@@ -185,6 +208,10 @@ const styles = StyleSheet.create({
   badgePill: { backgroundColor: colors.selectedBg, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
   badgeText: { fontSize: 12, color: colors.primary, fontWeight: '800' },
   ratingText: { fontSize: 13, color: colors.textSecondary },
+  stockBoxOut: { marginTop: 12, backgroundColor: colors.errorBg, borderWidth: 1, borderColor: colors.errorBorder, borderRadius: 14, padding: 12 },
+  stockOutText: { fontSize: 13, color: colors.errorText, fontWeight: '700', lineHeight: 18 },
+  stockBoxLow: { marginTop: 12, alignSelf: 'flex-start', backgroundColor: colors.errorBg, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  stockLowText: { fontSize: 13, color: colors.errorText, fontWeight: '800' },
   desc: { marginTop: 14, fontSize: 15, color: colors.textSecondary, lineHeight: 22 },
   priceRow: { flexDirection: 'row', gap: 10, alignItems: 'baseline', marginTop: 16 },
   price: { fontSize: 32, fontWeight: '800', color: colors.primary },

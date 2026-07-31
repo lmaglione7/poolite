@@ -29,6 +29,8 @@ export function useCatalog() {
             badge: r.badge,
             desc: r.description,
             imageUrl: r.image_url ?? null,
+            stock: r.stock ?? undefined,
+            sold: r.sold ?? undefined,
           }))
         );
       }

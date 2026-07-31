@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors } from '../../theme/colors';
-import { CARRIERS, PAYMENT_METHODS } from '../../data/commerce';
+import { CARRIERS } from '../../data/commerce';
+import { PaymentMarks } from './PaymentMarks';
 
-// Carrier + payment trust strip. Text badges by design: official partner
-// logos require each brand's media kit and agreement — swap in later.
+// Carrier + payment trust strip. Carrier names are text badges by design:
+// official partner logos require each brand's media kit and agreement.
 export function TrustRow({ style }: { style?: ViewStyle }) {
   return (
     <View style={style}>
@@ -15,16 +16,7 @@ export function TrustRow({ style }: { style?: ViewStyle }) {
           </View>
         ))}
       </View>
-      <Text style={[styles.rowLabel, { marginTop: 12 }]}>PAGA COME PREFERISCI</Text>
-      <View style={styles.pillRow}>
-        {PAYMENT_METHODS.map((p) => (
-          <View key={p.id} style={styles.pill}>
-            <Text style={styles.pillText}>
-              {p.icon} {p.label}
-            </Text>
-          </View>
-        ))}
-      </View>
+      <PaymentMarks style={{ marginTop: 12 }} />
     </View>
   );
 }
