@@ -40,7 +40,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "reset": "rm -rf node_modules package-lock.json .expo && npm install && expo start -c",
+    "check-sdk": "expo config --type public --json"
   },
   "private": true
 }
