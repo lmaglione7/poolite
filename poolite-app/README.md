@@ -14,6 +14,10 @@ Scan the QR with Expo Go, or press `i`/`a` for a simulator. The app works
 fully in **demo mode** with no setup: onboarding, weather (live, via
 Open-Meteo), and the Shop catalog all work locally on-device.
 
+> **Expo SDK 54** — pinned on purpose. Expo Go from the App Store supports one
+> SDK at a time, so the project must match it or the phone shows *"Project is
+> incompatible with this version of Expo Go"*. See `AGENTS.md` before bumping.
+
 To turn on real accounts, a real Postgres-backed marketplace, and real
 Stripe payments, follow **`supabase/README.md`** and fill in `.env` (copy
 from `.env.example`).

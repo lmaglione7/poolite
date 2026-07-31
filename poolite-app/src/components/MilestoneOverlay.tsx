@@ -76,7 +76,11 @@ export function MilestoneOverlay() {
 
 const styles = StyleSheet.create({
   backdrop: {
-    ...StyleSheet.absoluteFill,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(18,49,58,0.45)',
     alignItems: 'center',
     justifyContent: 'center',

@@ -28,8 +28,11 @@ export function CategoryTile({
 const styles = StyleSheet.create({
   // Explicit basis (not flex:1) so 3 tiles wrap per row instead of 6 sharing one row.
   wrap: { width: '31.5%', flexGrow: 0, flexShrink: 0, height: 76, borderRadius: 16, overflow: 'hidden', borderWidth: 2 },
-  img: { ...StyleSheet.absoluteFill, width: undefined, height: undefined },
-  gradient: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(14,90,109,0.35)' },
+  // Proprietà esplicite invece di StyleSheet.absoluteFill: quest'ultimo è uno
+  // stile registrato (numero) in alcune versioni di React Native e non si può
+  // usare con lo spread.
+  img: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: undefined, height: undefined },
+  gradient: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(14,90,109,0.35)' },
   label: {
     position: 'absolute',
     left: 4,
